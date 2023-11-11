@@ -3,6 +3,7 @@ import { RouterLink, RouterView } from 'vue-router'
 import NavBar from './components/NavBar.vue'
 import Footer from './components/Footer.vue'
 import { ref } from 'vue'
+import SideBar from './components/SideBar.vue';
 
 
 
@@ -11,7 +12,13 @@ import { ref } from 'vue'
 <template>
   <div class="flex flex-col min-h-screen">
     <NavBar />
-    <RouterView />
+    
+    <div class="flex pt-5">
+      <SideBar class="w-1/5" />
+      <RouterView class="w-3/5" />
+      <RouterView class="w-1/5" />
+    </div>
+    
     <Footer />
   </div>
 </template>

@@ -26,7 +26,7 @@ const navigation = [
   <header>
     <Disclosure as="nav" v-slot="{ open }">
       <div class="mx-auto px-2 sm:px-6 lg:px-8">
-        <div class="relative flex h-20 items-center justify-between border-b border-slate-600">
+        <div class="relative flex h-20 items-center justify-between border-b dark:border-slate-600">
           <div class="flex">
             <div class="inset-y-0 left-0 flex items-center sm:hidden">
               <!-- Mobile menu button-->
