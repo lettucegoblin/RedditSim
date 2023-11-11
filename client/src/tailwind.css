@@ -1,0 +1,17 @@
+/* tailwind.config.js has custom colors */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-white dark:bg-reddit-primary-dark;
+    @apply text-black dark:text-reddit-text-body-dark;
+  }
+  h1, h2, h3, h4, h5, h6 {
+    @apply text-black dark:text-reddit-text-title-dark;
+  }
+  a {
+    @apply text-reddit-link-dark;
+  }
+}
