@@ -1,10 +1,3 @@
-<template>
-  <div class="post-list-item">
-    <h2>{{ post.title }}</h2>
-    <p>{{ post.content }}</p>
-    <p>Posted by {{ post.author }} on {{ formatDate(post.timestamp) }}</p>
-  </div>
-</template>
 
 <script setup lang="ts">
 import { defineProps } from 'vue'
@@ -41,6 +34,14 @@ function formatDate(timestamp: number): string {
   return new Date(timestamp).toLocaleDateString()
 }
 </script>
+
+<template>
+  <div class="post-list-item">
+    <h2>{{ post.title }}</h2>
+    <p>{{ post.content }}</p>
+    <p>Posted by {{ post.author }} on {{ formatDate(post.timestamp) }}</p>
+  </div>
+</template>
 
 <style scoped>
 .post-list-item {
