@@ -1,3 +1,27 @@
+<script setup lang="ts">
+import { ref } from 'vue';
+import { Disclosure, DisclosureButton, DisclosurePanel, Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/vue'
+
+const darkMode = ref(true)
+
+const toggleDarkMode = () => {
+  darkMode.value = !darkMode.value
+  if (darkMode.value) {
+    document.documentElement.classList.add('dark')
+  } else {
+    document.documentElement.classList.remove('dark')
+  }
+}
+
+
+const navigation = [
+  { name: 'Dashboard', href: '#', current: true },
+  { name: 'Team', href: '#', current: false },
+  { name: 'Projects', href: '#', current: false },
+  { name: 'Calendar', href: '#', current: false },
+]
+</script>
+
 <template>
   <header>
     <Disclosure as="nav" v-slot="{ open }">
@@ -98,28 +122,5 @@
   </header>
 </template>
 
-<script setup lang="ts">
-import { ref } from 'vue';
-import { Disclosure, DisclosureButton, DisclosurePanel, Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/vue'
-
-const darkMode = ref(true)
-
-const toggleDarkMode = () => {
-  darkMode.value = !darkMode.value
-  if (darkMode.value) {
-    document.documentElement.classList.add('dark')
-  } else {
-    document.documentElement.classList.remove('dark')
-  }
-}
-
-
-const navigation = [
-  { name: 'Dashboard', href: '#', current: true },
-  { name: 'Team', href: '#', current: false },
-  { name: 'Projects', href: '#', current: false },
-  { name: 'Calendar', href: '#', current: false },
-]
-</script>
 
 <style scoped></style>

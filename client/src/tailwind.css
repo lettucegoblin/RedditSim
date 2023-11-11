@@ -4,8 +4,11 @@
 @tailwind utilities;
 
 @layer base {
+  html, body{
+    @apply h-full;
+  }
   body,
-  nav { /* nav is for the reddit header */
+  nav, footer { /* nav is for the reddit header */
     @apply bg-white dark:bg-reddit-primary-dark;
     @apply text-black dark:text-reddit-text-body-dark;
   }
