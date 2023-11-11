@@ -4,11 +4,34 @@
 @tailwind utilities;
 
 @layer base {
-  body {
+  body,
+  nav { /* nav is for the reddit header */
     @apply bg-white dark:bg-reddit-primary-dark;
     @apply text-black dark:text-reddit-text-body-dark;
   }
-  h1, h2, h3, h4, h5, h6 {
+  button,
+  input[type='text'] { /* text color for buttons and inputs */
+    @apply text-black dark:text-reddit-text-body-dark;
+  }
+  button {
+    @apply bg-white dark:bg-reddit-primary-dark;
+  }
+  input[type='text'] {
+    @apply bg-gray-100 dark:bg-reddit-neutral-background-dark;
+    text-overflow: clip;
+    text-overflow: ellipsis;
+  }
+  button:hover,
+  input[type='text']:hover {
+    @apply bg-white dark:bg-reddit-highlight-dark;
+    @apply text-black dark:text-reddit-text-body-dark;
+  }
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
     @apply text-black dark:text-reddit-text-title-dark;
   }
   a {

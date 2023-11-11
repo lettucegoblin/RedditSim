@@ -7,15 +7,37 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        'reddit-primary-dark': '#0b1416',
-        'reddit-secondary-dark': '#04090a',
-        'reddit-highlight-dark': '#1a282d',
-        'reddit-text-title-dark': '#f2f4f5',
-        'reddit-text-body-dark': '#b8c5c9',
-        'reddit-link-dark': '#b8c5c9',
+        'reddit-primary': { // background
+          dark: '#0b1416',
+          light: '#cee3e7'
+        }, 
+        'reddit-secondary': { // certain standout element backgrounds
+          dark: '#04090a',
+          light: '#ebedee'
+        }, 
+        'reddit-highlight': { // input, hover, active, selected
+          dark: '#1a282d',
+          light: '#ebedee'
+        }, 
+        'reddit-neutral-background': {
+          dark: '#0f1a1c',
+          light: '#f2f4f5'
+        },
+        'reddit-text-title': {
+          dark: '#f2f4f5',
+          light: '#0f1a1c'
+        },
+        'reddit-text-body': {
+          dark: '#b8c5c9',
+          light: '#0f1a1c'
+        },
+        'reddit-link': {
+          dark: '#b8c5c9',
+          light: '#1a282d'
+        }
       }
     }
   },
-  plugins: [],
+  plugins: []
 }
 
