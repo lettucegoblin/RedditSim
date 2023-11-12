@@ -1,6 +1,6 @@
 <template>
-  <nav class="flex flex-col w-64 border-r shadow">
-    <div class="flex items-center justify-center h-16 border-b">
+  <nav class="flex flex-col w-64 border-r reddit-divider-color shadow">
+    <div class="flex items-center justify-center h-16 border-b reddit-divider-color">
       <h1 class="text-lg font-bold">Subreddits</h1>
     </div>
     <div class="flex-grow overflow-y-auto">

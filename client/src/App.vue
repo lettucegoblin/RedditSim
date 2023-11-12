@@ -10,10 +10,10 @@ import SideBar from './components/SideBar.vue';
 </script>
 
 <template>
-  <div class="flex flex-col min-h-screen">
+  <div class="flex flex-col min-h-screen mx-auto px-2 sm:px-6 lg:px-8">
     <NavBar />
     
-    <div class="flex pt-5">
+    <div class="flex ">
       <SideBar class="w-1/5" />
       <RouterView class="w-3/5" />
       <RouterView class="w-1/5" />

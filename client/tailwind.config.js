@@ -34,6 +34,10 @@ module.exports = {
         'reddit-link': {
           dark: '#b8c5c9',
           light: '#1a282d'
+        },
+        'reddit-link-hover': {
+          dark: '#cee3e7',
+          light: '#ebedee'
         }
       }
     }

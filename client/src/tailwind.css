@@ -26,7 +26,7 @@
   }
   button:hover,
   input[type='text']:hover {
-    @apply bg-white dark:bg-reddit-highlight-dark;
+    @apply bg-slate-200 dark:bg-reddit-highlight-dark;
     @apply text-black dark:text-reddit-text-body-dark;
   }
   h1,
@@ -38,6 +38,12 @@
     @apply text-black dark:text-reddit-text-title-dark;
   }
   a {
-    @apply text-reddit-link-dark;
+    @apply dark:text-reddit-link-dark dark:hover:text-reddit-link-hover-dark hover:text-gray-800;
+  }
+}
+
+@layer components {
+  .reddit-divider-color {
+    @apply border-slate-200 dark:border-slate-800;
   }
 }
