@@ -14,9 +14,8 @@ import SideBar from './components/SideBar.vue';
     <NavBar />
     
     <div class="flex ">
-      <SideBar class="w-1/5" />
-      <RouterView class="w-3/5" />
-      <RouterView class="w-1/5" />
+      <SideBar class="hidden lg:block w-1/5" />
+      <RouterView class="w-4/5" />
     </div>
     
     <Footer />

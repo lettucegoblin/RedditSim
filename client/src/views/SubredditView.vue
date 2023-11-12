@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import { defineAsyncComponent } from 'vue';
-import type { PostItem } from '../components/PostListItem.vue';
 
+import type { PostItem } from '@/components/PostListItem.vue';
+import SubredditInfoBar, { type Subreddit } from '@/components/SubredditInfoBar.vue';
+import { defineAsyncComponent } from 'vue';
 const PostListItem = defineAsyncComponent(() => import('../components/PostListItem.vue'));
 
-// continue until id 33
 const testData: PostItem[] = [
   { id: 1, title: 'TIL the FBI has struggled to hire hackers because of the FBI hiring rule that the applicant must not have used marijuana during the last 3 years', author: 'flaggingd', timestamp: Date.now() - 213444, content: 'Its funny how much people will lie about this stuff on the internet. I am in no way a hacker but i can assure you that there are many people out there who smoke weed regularly and do it professionally as well. This is just an example of someones opinion being passed around as fact without any research done.\n\nThe problem with this is that when you start looking into what is actually true, you find more lies than facts. ', upvotes: 124, downvotes: 9, comments: [{ id: 1, author: 'BooBan44x', timestamp: Date.now() - 132415, content: 'Great post!' }, { id: 2, author: 'Cptn_Squirrel', timestamp: Date.now() - 107886, content: 'This is why I don\'t use the internet.' }] },
   { id: 2, title: 'How to tell if your phone is listening to you', author: 'Alyssa_Wolfe', timestamp: Date.now() - 197831, content: 'I know that there are many ways to tell if your phone is listening to you, but I thought I would share my personal experience with you all. A few weeks ago, I was sitting at home watching TV when I heard a strange noise coming from my phone. It sounded like someone was talking to me through the speaker. I looked over at my phone and saw that it was recording a video of me.\n\nAt first, I thought it was just a glitch or something, but after a few minutes, I realized that it was actually recording me. I quickly turned off my phone and went to the store to get a new one.', upvotes: 100, downvotes: 12, comments: [{ id: 3, author: 'Alice_Rosie', timestamp: Date.now() - 181452, content: 'That is so creepy!' }, { id: 4, author: 'Jayden_Harris', timestamp: Date.now() - 175431, content: 'What kind of phone did you have?' }] },
@@ -18,13 +18,45 @@ const testData: PostItem[] = [
   { id: 10, title: 'The benefits of exercise', author: 'Emma_Williams', timestamp: Date.now() - 105011, content: 'I recently learned about the term "exercise" and wanted to share my thoughts on it with you all. Exercise is important for both physical and mental health. It helps to improve cardiovascular health, build muscle strength, and reduce stress. I hope that people will make exercise a regular part of their lives and experience the many benefits it has to offer.', upvotes: 100, downvotes: 8, comments: [{ id: 19, author: 'Cptn_Squirrel', timestamp: Date.now() - 99011, content: 'I have noticed the benefits of exercise and it has improved my life.' }, { id: 20, author: 'Flaggingd', timestamp: Date.now() - 95011, content: 'I have started exercising and it has made a big difference in my life.' }] }
 ];
 
+const sidebarData = [
+  {
+    subreddits: [
+      {
+        id: 1,
+        name: 'r/aww',
+        subredditName: 'r/aww',
+        members: 12345678,
+        online: 12345,
+        rules: [
+          { id: 1, text: 'No posts about politics or religion.' },
+          { id: 2, text: 'No posts about politics or religion.' },
+        ],
+        usefulLinks: [
+          { id: 1, text: 'About', url: 'https://www.reddit.com/r/aww/about/' },
+          { id: 2, text: 'Rules', url: 'https://www.reddit.com/r/aww/about/rules/' },
+        ],
+        moderators: [
+          { id: 1, name: 'Mod1' },
+          { id: 2, name: 'Mod2' },
+        ],
+      } as Subreddit,
+    ],
+  } 
+];
 
 </script>
 
 <template>
-  <main>
-    <div v-for="post in testData" :key="post.id">
-      <PostListItem :post="post" />
+
+  <div class="flex flex-row">
+    <div class="flex flex-col">
+      <div v-for="post in testData" :key="post.id" class="col-span-1">
+        <PostListItem :post="post" />
+      </div>
     </div>
-  </main>
+    <SubredditInfoBar :subreddit="sidebarData[0].subreddits[0]" class="hidden md:block w-2/3"/>
+  </div>
+
 </template>
+
+<style scoped></style>
