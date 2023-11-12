@@ -1,0 +1,102 @@
+###'/api/v1/:subreddit/about'
+http://localhost:3000/api/v1/test/about
+
+###'/api/v1/:subreddit/:postId'
+http://localhost:3000/api/v1/test/1
+
+###'/api/v1/:subreddit'
+http://localhost:3000/api/v1/test
+
+###
+POST https://dummyjson.com/products/add
+Content-Type: application/json
+
+{
+  "id": 101,
+  "title": "Pumpkin",
+  "price": "3.56"
+}
+
+###
+http://localhost:3000
+
+
+/////////////////////////
+// Products
+
+###
+http://localhost:3000/api/v1/products
+
+###
+POST http://localhost:3000/api/v1/products
+Content-Type: application/json
+
+{
+  "title": "Pumpkin",
+  "price": "3.56"
+}
+
+###
+PATCH http://localhost:3000/api/v1/products/31
+Content-Type: application/json
+
+{
+  "title": "Pumpkin Spice Latte",
+  "price": "6.56"
+}
+
+###
+DELETE http://localhost:3000/api/v1/products/31
+
+
+###
+https://newpaltz-fall-2023.onrender.com/api/v1/products/28
+
+
+/////////////////////////
+// Users
+
+###
+http://localhost:3000/api/v1/users
+
+###
+POST http://localhost:3000/api/v1/users
+Content-Type: application/json
+
+{
+  "firstName": "Moshe",
+  "lastName": "Plotkin",
+  "email": "plotkinm@newpaltz.edu",
+  "password": "123456"
+}
+
+###
+PATCH http://localhost:3000/api/v1/users/31
+Content-Type: application/json
+
+{
+  "firstName": "Rabbi Moshe"
+}
+
+###
+DELETE http://localhost:3000/api/v1/products/31
+
+###
+POST http://localhost:3000/api/v1/users/register
+Content-Type: application/json
+
+{
+  "firstName": "Moshe",
+  "lastName": "Plotkin",
+  "email": "plotkinm@newpaltz.edu",
+  "password": "12345678"
+}
+
+###
+POST http://localhost:3000/api/v1/users/login
+Content-Type: application/json
+
+{
+  "email": "plotkinm@newpaltz.edu",
+  "password": "12345678"
+}
