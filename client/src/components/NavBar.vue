@@ -1,5 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue';
+// router
+import { RouterLink } from 'vue-router';
 import { Disclosure, DisclosureButton, DisclosurePanel, Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/vue'
 
 const darkMode = ref(true)
@@ -30,16 +32,18 @@ const navigation = [
           <div class="flex">
             <div class="inset-y-0 left-0 flex items-center sm:hidden">
               <!-- Mobile menu button-->
-              <DisclosureButton
-                class="relative inline-flex items-center justify-center rounded-md p-2 text-gray-400 hover:bg-gray-700 hover:text-white focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white">
-                <span class="absolute -inset-0.5" />
-                <span class="sr-only">Open main menu</span>
+            <DisclosureButton
+              class="relative inline-flex items-center justify-center rounded-md p-2 text-gray-400 hover:bg-gray-700 hover:text-white focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white">
+              <span class="absolute -inset-0.5" />
+              <span class="sr-only">Open main menu</span>
                 <font-awesome-icon v-if="!open" icon="bars" class="block h-6 w-6" />
                 <font-awesome-icon v-else icon="times" class="block h-6 w-6" />
               </DisclosureButton>
             </div>
             <div class="flex flex-shrink-0 items-center">
-              <img class="h-10 w-auto" src="@/assets/logo.png" alt="Reddit Sim" />
+              <RouterLink to="/">
+                <img class="h-10 w-auto" src="@/assets/logo.png" alt="Reddit Sim" />
+              </RouterLink>
             </div>
           </div>
           <div class="flex flex-1 items-center justify-center">
@@ -54,10 +58,10 @@ const navigation = [
                     placeholder="Search Reddit" />
                 </div>
                 <!--
-                <a v-for="item in navigation" :key="item.name" :href="item.href"
-                  :class="[item.current ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white', 'rounded-md px-3 py-2 text-sm font-medium']"
-                  :aria-current="item.current ? 'page' : undefined">{{ item.name }}</a>
-                  -->
+                  <a v-for="item in navigation" :key="item.name" :href="item.href"
+                    :class="[item.current ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white', 'rounded-md px-3 py-2 text-sm font-medium']"
+                    :aria-current="item.current ? 'page' : undefined">{{ item.name }}</a>
+                    -->
               </div>
             </div>
           </div>
