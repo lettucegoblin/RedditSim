@@ -64,13 +64,13 @@ const navigation = [
           <div class="flex static inset-auto ml-6 pr-0">
             <div class="flex items-center space-x-2">
               <button type="button"
-                class="relative rounded-full bg-gray-800 p-1 text-gray-400 hover:text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800">
+                class="relative rounded-full w-10 h-10 hover:text-gray-500 dark:hover:text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800">
                 <span class="absolute -inset-1.5" />
                 <span class="sr-only">View notifications</span>
                 <font-awesome-icon icon="bell" class="h-6 w-6" />
               </button>
               <button @click=toggleDarkMode type="button"
-                class="relative rounded-full bg-gray-800 p-1 text-gray-400 hover:text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800">
+                class="relative rounded-full w-10 h-10 hover:text-gray-500 dark:hover:text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800">
                 <span class="absolute -inset-1.5" />
                 <span class="sr-only">Toggle Dark Mode</span>
                 <font-awesome-icon :icon="darkMode ? 'moon' : 'sun'" class="h-6 w-6" />
@@ -83,7 +83,7 @@ const navigation = [
                   class="relative flex rounded-full bg-gray-800 text-sm focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800">
                   <span class="absolute -inset-1.5" />
                   <span class="sr-only">Open user menu</span>
-                  <img class="h-8 w-8 rounded-full"
+                  <img class="h-10 w-auto rounded-full"
                     src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
                     alt="" />
                 </MenuButton>
@@ -114,7 +114,7 @@ const navigation = [
       <DisclosurePanel class="sm:hidden">
         <div class="space-y-1 px-2 pb-3 pt-2">
           <DisclosureButton v-for="item in navigation" :key="item.name" as="a" :href="item.href"
-            :class="[item.current ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white', 'block rounded-md px-3 py-2 text-base font-medium']"
+            :class="[item.current ? 'text-gray-800 bg-gray-200 dark:bg-gray-900 dark:text-white' : 'text-gray-800 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700 dark:hover:text-white', 'block rounded-md px-3 py-2 text-base font-medium']"
             :aria-current="item.current ? 'page' : undefined">{{ item.name }}</DisclosureButton>
         </div>
       </DisclosurePanel>
