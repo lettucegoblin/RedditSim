@@ -1,26 +1,6 @@
-
 <script setup lang="ts">
+import type { PostItem } from '@/model/subreddit';
 import { defineProps } from 'vue'
-
-export interface CommentItem {
-  id: number;
-  author: string;
-  timestamp: number;
-  content: string;
-}
-
-export interface PostItem {
-  id: number;
-  title: string;
-  author: string;
-  timestamp: number;
-  content: string;
-  upvotes: number;
-  downvotes: number;
-  comments: CommentItem[];
-}
-
-
 
 const props = defineProps({
   post: {

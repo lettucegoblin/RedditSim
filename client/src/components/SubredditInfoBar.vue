@@ -1,3 +1,16 @@
+<script setup lang="ts">
+import { defineProps, ref } from 'vue'
+import { type Subreddit } from '@/model/subreddit'
+
+const props = defineProps({
+  subreddit: {
+    type: Object as () => Subreddit,
+    required: true
+  }
+})
+
+</script>
+
 <template>
   <div>
     <h2>{{ subreddit.name }}</h2>
@@ -9,7 +22,9 @@
     </ul>
     <h3>Useful Links</h3>
     <ul>
-      <li v-for="link in subreddit.usefulLinks" :key="link.id"><a :href="link.url">{{ link.text }}</a></li>
+      <li v-for="link in subreddit.usefulLinks" :key="link.id">
+        <a :href="link.url">{{ link.text }}</a>
+      </li>
     </ul>
     <h3>Moderators</h3>
     <ul>
@@ -17,27 +32,3 @@
     </ul>
   </div>
 </template>
-
-<script setup lang="ts">
-import { defineProps, ref } from 'vue';
-
-export interface Subreddit {
-  id: number;
-  name: string;
-  members: number;
-  online: number;
-  rules: { id: number; text: string }[];
-  usefulLinks: { id: number; text: string; url: string }[];
-  moderators: { id: number; name: string }[];
-};
-
-const props = defineProps({
-  subreddit: {
-    type: Object as () => Subreddit,
-    required: true
-  }
-});
-
-const subreddit = ref(props.subreddit);
-
-</script>
