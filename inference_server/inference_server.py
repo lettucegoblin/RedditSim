@@ -21,6 +21,7 @@ required_comment_keys = ['user', 'text']
 def generate_comments():
     postObj = request.json.get('postObj')
     commentPath = request.json.get('commentPath')
+    next_user = request.json.get('nextUser')
     if not all(key in postObj for key in optional_post_keys): # check if postObj has all required keys
         return jsonify({'error': 'postObj does not have the correct format'})
 
@@ -35,9 +36,13 @@ def generate_comments():
             if not isinstance(comment[key], str) or not comment[key] or len(comment[key].strip()) == 0:
                 return jsonify({'error': 'commentPath does not have the correct format'})
 
+    # sanitize next_user, enforce that it is a string and not empty
+    next_user = next_user if next_user else ''
+    if not isinstance(next_user, str) or not next_user or len(next_user.strip()) == 0:
+        return jsonify({'error': 'nextUser does not have the correct format'})
     if not model.is_loaded():
         model.load_model()
-    comments = model.generate_comments(postObj, commentPath, 5)
+    comments = model.generate_comments(postObj, commentPath, next_user, 5)
     return jsonify({'commentPath': comments})
 
 if __name__ == '__main__':

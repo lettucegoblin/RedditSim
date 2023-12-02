@@ -201,7 +201,7 @@ Assistant:"""
         options["text"] = self.generate_with_lora(prompt_full, self.lora_submission, len(prompt_full) + 500)
         return options
 
-    def generate_comments(self, postObj, existingComments = [], num_comments=random.randint(1, 5)):
+    def generate_comments(self, postObj, existingComments = [], next_user = "", num_comments=random.randint(1, 5)):
     
         initialPrompt = f"""You are a Reddit user comment generator. In the conversation you change your Reddit username often to simulate different users.
 User: You are on the subreddit {postObj["subreddit"]}.
@@ -228,7 +228,11 @@ Assistant: """ #  Undercoverotaku - Was looking for the comment pointing this ou
                 }
                 comments.append(existingComment)
                 initialPrompt = f"""{initialPrompt}{existingComment["formatted"]}\n{folowupPrompt}"""
-        comment_first_char = self.gen_valid_first_character(include_digits=False)
+        
+        if next_user:
+            comment_first_char = f"""{next_user} - """
+        else:
+            comment_first_char = self.gen_valid_first_character(include_digits=False)
         prompt_builder = initialPrompt + comment_first_char
         for i in range(num_comments):
             attempts = 0

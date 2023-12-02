@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import type { PostItem } from '@/model/subreddit';
+import type { SubmissionsItem } from '@/model/subreddit';
 import { defineProps } from 'vue'
 
 const props = defineProps({
   post: {
-    type: Object as () => PostItem,
+    type: Object as () => SubmissionsItem,
     required: true
   }
 })
@@ -18,7 +18,7 @@ function formatDate(timestamp: number): string {
 <template>
   <div class="rounded-2xl p-4 mx-8 mb-4 hover:bg-slate-200 dark:hover:bg-reddit-highlight-dark">
     <h2>{{ post.title }}</h2>
-    <p>{{ post.content }}</p>
+    <p>{{ post.text }}</p>
     <p>Posted by {{ post.author }} on {{ formatDate(post.timestamp) }}</p>
   </div>
 </template>

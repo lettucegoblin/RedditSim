@@ -1,5 +1,5 @@
-const API_ROOT = "http://localhost:3000/api/v1";
-
+const API_ROOT = import.meta.env.VITE_API_ROOT as string;
+console.log("API_ROOT", API_ROOT);
 /**
  * Makes a RESTful API call to the specified URL using the specified HTTP method and request body.
  * @param url - The URL to make the API call to.
@@ -24,6 +24,17 @@ export function rest(url: string, body?: unknown, method?: string) {
 
 export function api(action: string, body?: unknown, method?: string) {
   return rest(`${API_ROOT}/${action}`, body, method);
+}
+
+
+export type DataEnvelope<T> = {
+  data: T,
+  isSuccess: boolean,
+  error?: string,
+}
+
+export type DataListEnvelope<T> = DataEnvelope<T[]> & {
+  total: number,
 }
 
 /* List of Asynchronous patterns:

@@ -1,10 +1,15 @@
 <script setup lang="ts">
-import { ref } from 'vue'
-import { getSubreddits } from '@/model/subreddit'
+import { computed, ref } from 'vue'
+import { getSubreddits, type Subreddit} from '@/model/subreddit'
 
-const subreddits = getSubreddits()
+const subreddits = ref<Subreddit[]>([])
 
-const selectedSubreddit = ref(subreddits[0])
+getSubreddits().then((envelopeList) => {
+  subreddits.value = envelopeList.data
+  console.log(subreddits.value)
+})
+
+//const selectedSubreddit = ref(subreddits[0])
 </script>
 
 <template>
@@ -14,17 +19,25 @@ const selectedSubreddit = ref(subreddits[0])
     </div>
     <div class="flex-grow overflow-y-auto">
       <ul class="flex flex-col py-4 space-y-1">
-        <li v-for="subreddit in subreddits" :key="subreddit.id">
+        <li v-for="subreddit in subreddits" :key="subreddit._id">
           <RouterLink
-            :to="`/r/${subreddit.name}`"
+            :to="`/r/${subreddit.display_name}`"
             class="flex items-center px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-gray-100"
           >
-            <span class="text-sm font-medium">{{ subreddit.name }}</span>
+            <span class="text-sm font-medium">{{ subreddit.display_name }}</span>
             <span class="ml-auto text-xs font-semibold text-gray-500 dark:text-gray-400"
-              >{{ subreddit.members }} subscribers</span
+              >{{ subreddit.subscribers }} subscribers</span
             >
           </RouterLink>
         </li>
+        <RouterLink to="/r/aww">
+          aww
+        </RouterLink>
+
+        <RouterLink to="/about">
+          about
+        </RouterLink>
+        
       </ul>
     </div>
   </nav>

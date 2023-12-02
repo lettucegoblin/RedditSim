@@ -1,8 +1,8 @@
 // express.js
-
+require('dotenv').config()
 const path = require("path");
 const express = require("express");
-const productController = require("./controllers/products");
+const subredditController = require("./controllers/subreddit");
 const userController = require("./controllers/users");
 const app = express();
 
@@ -270,50 +270,11 @@ app
     res.header("Access-Control-Allow-Headers", "*");
     next();
   })
-  .use("/api/v1/me", (req, res) => {
+  .use("/api/v1/me", (req, res, next) => {
     res.json({ message: "user profile" });
   })
-  .use("/user/:userId/about", (req, res) => {
-    const { userId } = req.params;
-    res.json({ message: `about user ${userId}` });
-  })
-  .use("/user/:userId/comments", (req, res) => {
-    const { userId } = req.params;
-    res.json({ message: `comments of user ${userId}` });
-  })
-  .use("/user/:userId/posts", (req, res) => {
-    const { userId } = req.params;
-
-    res.json({ message: `posts of user ${userId}` });
-  })
-  .use("/user/:userId", (req, res) => {
-    const { userId } = req.params;
-    res.json({ message: `whole user ${userId}` });
-  })
-  .use("/api/v1/subreddits/:subreddit/about", (req, res) => {
-    const { subreddit } = req.params;
-    res.json({ message: `about subreddit ${subreddit}` });
-  })
-  .use("/api/v1/subreddits/:subreddit/posts", (req, res) => {
-    const { subreddit } = req.params;
-    res.json({ message: `posts ${subreddit}` });
-  })
-  .use("/api/v1/subreddits/:subreddit/comments/:commentId", (req, res) => {
-    const { subreddit, commentId } = req.params;
-    res.json({ message: `comment ${commentId} of subreddit ${subreddit}` });
-  })
-  .use("/api/v1/subreddits/:subreddit/:postId", (req, res) => {
-    const { subreddit, postId } = req.params;
-    res.json({ message: `post ${postId} of subreddit ${subreddit}` });
-  })
-  .use("/api/v1/subreddits/:subreddit", (req, res) => {
-    const { subreddit } = req.params;
-    res.json({ message: `subreddit ${subreddit}` });
-  })
-
-  .use("/api/v1/products", productController)
+  .use("/api/v1/subreddits", subredditController)
   .use("/api/v1/users", userController)
-
   .get("*", (req, res) => {
     res.sendFile(path.join(__dirname, "../client/dist/index.html"));
   });

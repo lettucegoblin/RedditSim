@@ -4,19 +4,19 @@
   "description": "",
   "author": "",
   "license": "ISC",
-
   "scripts": {
     "build": "npm i --production && cd client && npm i && npm run build",
     "start": "node web_server/index.js",
     "dev": "nodemon --watch ./web_server web_server/index.js"
   },
   "dependencies": {
-    "express": "^4.17.20"
+    "dotenv": "^16.3.1",
+    "express": "^4.17.20",
+    "mongodb": "^6.3.0"
   },
   "devDependencies": {
-    "@types/node": "20.8.9",
     "@types/express": "^4.17.20",
+    "@types/node": "20.8.9",
     "nodemon": "^3.0.1"
   }
-
 }
