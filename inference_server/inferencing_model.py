@@ -201,7 +201,7 @@ Assistant:"""
         options["text"] = self.generate_with_lora(prompt_full, self.lora_submission, len(prompt_full) + 500)
         return options
 
-    def generate_comments(self, postObj, num_comments=random.randint(1, 5)):
+    def generate_comments(self, postObj, existingComments = [], num_comments=random.randint(1, 5)):
     
         initialPrompt = f"""You are a Reddit user comment generator. In the conversation you change your Reddit username often to simulate different users.
 User: You are on the subreddit {postObj["subreddit"]}.
@@ -219,6 +219,15 @@ Assistant: """ #  Undercoverotaku - Was looking for the comment pointing this ou
             ["\nUser:", self.tokenizer.eos_token_id]
         )
         comments = []
+        if len(existingComments) > 0:
+            for comment in existingComments:
+                existingComment = {
+                    "user": comment["user"],
+                    "text": comment["text"],
+                    "formatted": f"""{comment["user"]} - {comment["text"]}"""
+                }
+                comments.append(existingComment)
+                initialPrompt = f"""{initialPrompt}{existingComment["formatted"]}\n{folowupPrompt}"""
         comment_first_char = self.gen_valid_first_character(include_digits=False)
         prompt_builder = initialPrompt + comment_first_char
         for i in range(num_comments):
@@ -250,10 +259,15 @@ Assistant: """ #  Undercoverotaku - Was looking for the comment pointing this ou
             if broke:
                 print('broke')
                 break
-            comments.append(comment)
+            commentObj = {
+                "user": comment[:indexOfDash].strip(),
+                "text": comment[indexOfDash + 1:].strip(),
+                "formatted": comment
+            }
+            comments.append(commentObj)
             
             comment_first_char = self.gen_valid_first_character(include_digits=False)
-            prompt_builder = f"""{prompt_builder}{comment}\n{folowupPrompt}{comment_first_char}"""
+            prompt_builder = f"""{prompt_builder}{commentObj["formatted"]}\n{folowupPrompt}{comment_first_char}"""
         #print(prompt_builder)
         return comments
     # Helpers
