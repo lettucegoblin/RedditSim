@@ -30,13 +30,7 @@ getSubreddits().then((envelopeList) => {
             >
           </RouterLink>
         </li>
-        <RouterLink to="/r/aww">
-          aww
-        </RouterLink>
-
-        <RouterLink to="/about">
-          about
-        </RouterLink>
+        
         
       </ul>
     </div>

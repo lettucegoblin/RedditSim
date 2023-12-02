@@ -1,33 +1,39 @@
 <script setup lang="ts">
 import { type SubmissionsItem, type Subreddit } from '@/model/subreddit'
 import SubredditInfoBar from '@/components/SubredditInfoBar.vue'
-import { computed, defineAsyncComponent, ref, type PropType } from 'vue'
+import { computed, defineAsyncComponent, ref, type PropType, onMounted, watch } from 'vue'
 import { getSubmissions, getSubredditByName } from '@/model/subreddit'
 import { useRoute } from 'vue-router';
 const route = useRoute();
 const PostListItem = defineAsyncComponent(() => import('../components/PostListItem.vue'))
 
-const currentPage = computed(() => {
-  const str = route.params.subreddit
-  console.log('str', str);
-  if (typeof str === 'string') {
-    return str;
-  }else {
-    return str.join(' ');
+watch(
+  () => route.params.subreddit,
+  async newSubreddit => {
+    console.log('newSubreddit', newSubreddit);
+    currentPage.value = makeString(newSubreddit);
+    dataInit();
   }
-});
+)
+const makeString = (str: string | string[]) =>
+  Array.isArray(str) ? str[0].toString() : str.toString()
+
+
+const currentPage = ref<string>(makeString(route.params.subreddit));
+
 const subreddit = ref<Subreddit>();
 const submissions = ref<SubmissionsItem[]>([]);
 console.log('currentPage.value', currentPage.value);
-getSubredditByName(currentPage.value).then((envelope) => {
-  subreddit.value = envelope.data;
-  console.log("envelope",envelope);
-});
+function dataInit() {
+  getSubredditByName(currentPage.value).then((envelope) => {
+    subreddit.value = envelope.data;
+  });
 
-getSubmissions(currentPage.value).then((envelope) => {
-  submissions.value = envelope.data;
-  console.log("envelope",envelope);
-});
+  getSubmissions(currentPage.value).then((envelope) => {
+    submissions.value = envelope.data;
+  });
+}
+dataInit();
 
 
 </script>
