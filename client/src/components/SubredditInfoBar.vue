@@ -13,8 +13,8 @@ const props = defineProps({
 
 <template>
   <div>
-    <h2>{{ subreddit.name }}</h2>
-    <p>{{ subreddit.members }} members</p>
+    <h2>{{ subreddit.display_name }}</h2>
+    <p>{{ subreddit.subscribers }} members</p>
     <p>{{ subreddit.online }} online</p>
     <h3>Rules</h3>
     <ul>

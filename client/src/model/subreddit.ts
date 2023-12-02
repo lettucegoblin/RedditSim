@@ -33,29 +33,23 @@ export interface SubmissionsItem {
   upvotes: number
   downvotes: number
   comments: CommentItem[]
+  pending: boolean
 }
-/*
-{
-        "author": "pikachu_daddy",
-        "media": "text",
-        "postPrompt": "You are a Reddit post generator.User: Subreddit: /r/AskReddit Author: pikachu_daddy Media: text Title: 1962 Volkswagen Beetle Write the Reddit post.Assistant:",
-        "subreddit": "/r/AskReddit",
-        "text": " My dad bought this car in 1970 for $500 and he still has it today at age 84. Heu2019s had to replace some parts (like the engine) but everything else is original including the paint job! I think my mom wants him to sell it once he can no longer drive, but I hope not because it would be like selling family history.Edit: Thank you all so much for your kind words! My parents have been married for over 54 years now and they met back when he was working on his first VW Bug. They both love cars and my dad even worked as an auto mechanic before going into teaching. Itu2019s really amazing that heu2019s kept this one for so long!",
-        "title": "1962 Volkswagen Beetle"
-    }
-*/
-//temp for testing
 
+//submissions item pending
+export interface SubmissionsItemPending {
+  timestamp: number
+}
 
-export function getSubreddits(): Promise<DataListEnvelope<Subreddit>> {
-  return myFetch.api('subreddits/all');
+export function getSubreddits(page: number, pageSize: number): Promise<DataListEnvelope<Subreddit>> {
+  return myFetch.api('subreddits/all', { page, pageSize });
 }
 
 export function getSubredditByName(name: string): Promise<DataEnvelope<Subreddit>> {
   return myFetch.api(`subreddits/${name}`);
 }
 
-export function getSubmissions(subredditName: string): Promise<DataListEnvelope<SubmissionsItem>> {
-  return myFetch.api(`subreddits/${subredditName}/submissions`);
+export function getSubmissions(subredditName: string, page: number, pageSize: number): Promise<DataListEnvelope<SubmissionsItem>> {
+  return myFetch.api(`subreddits/${subredditName}/submissions`, { page, pageSize });
 }
 

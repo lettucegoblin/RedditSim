@@ -52,13 +52,17 @@ async function deleteAll() {
 }
 
 // Submissions
+// get all submissions of all subreddits
+async function getAllSubmissions(page = 1, pageSize = 30) {
+  return Submissions.getAll(page, pageSize);
+}
 
 // get all submissions of a subreddit pagification
-async function getAllSubmissions(display_name, page = 1, pageSize = 30) {
+async function getAllSubmissionsOfSubreddit(display_name, page = 1, pageSize = 30) {
   const col = await collection();
   const subreddit = await col.findOne({ display_name });
   const subreddit_id = subreddit._id;
-  return await Submissions.getAll(subreddit_id, page, pageSize);
+  return await Submissions.getAllBySubredditId(subreddit_id, page, pageSize);
 }
 // add a submission to a subreddit
 async function addSubmission(display_name, submission) {
@@ -76,4 +80,5 @@ module.exports = {
   deleteAll,
   getAllSubmissions,
   addSubmission,
+  getAllSubmissionsOfSubreddit
 };

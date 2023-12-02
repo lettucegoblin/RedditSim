@@ -7,19 +7,13 @@ import SideBar from './components/SideBar.vue'
 </script>
 
 <template>
-  <RouterLink :to="{ name: 'subreddit', params: { subreddit: 'aww' } }">
-    aww
-  </RouterLink>
 
-  <RouterLink :to="{ name: 'subreddit', params: { subreddit: 'AITA' } }">
-    AITA
-  </RouterLink>
   <div class="flex flex-col min-h-screen mx-auto px-2 sm:px-6 lg:px-8">
     <NavBar />
 
-    <div class="flex">
-      <SideBar class="hidden lg:block w-1/5" />
-      <RouterView class="w-4/5" />
+    <div class="flex w-full">
+      <SideBar class="hidden md:block w-1/5" />
+      <RouterView class="flex flex-row w-4/5"/>
     </div>
 
     <Footer />
