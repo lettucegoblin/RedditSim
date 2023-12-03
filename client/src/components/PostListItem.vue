@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { SubmissionsItem, SubmissionsItemPending } from '@/model/subreddit';
+import type { SubmissionsItem } from '@/model/subreddit';
 import { computed, defineProps } from 'vue'
 
 const props = defineProps({
@@ -8,6 +8,10 @@ const props = defineProps({
     required: true
   }
 })
+
+if(props.post.pending) {
+  console.log('props.post.pending', props.post.pending);
+}
 
 function formatDate(timestamp: number): string {
   // Format the date however you like
@@ -20,6 +24,9 @@ function formatDate(timestamp: number): string {
     <h2>{{ post.title }}</h2>
     <p>{{ post.text }}</p>
     <p>Posted by {{ post.author }} on {{ formatDate(post.timestamp) }}</p>
+  </div>
+  <div v-else class="rounded-2xl p-4 mx-8 mb-4 bg-slate-200 dark:bg-reddit-highlight-dark">
+    <h2>Loading...</h2>
   </div>
 </template>
 

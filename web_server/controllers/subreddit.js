@@ -57,6 +57,12 @@ router
       })
       .catch(next);
   })
+  .get("/deleteAllSubmissions", (req, res, next) => {
+    model.deleteAllSubmissions().then((result) => {
+      const data = { data: result, isSuccessful: true };
+      res.json(data);
+    }).catch(next);
+  })
   .get("/about", (req, res, next) => {
     const { subreddit } = req.params;
     res.json({ message: `about subreddit ${subreddit}` });

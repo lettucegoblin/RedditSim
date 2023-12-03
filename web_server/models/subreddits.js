@@ -13,6 +13,7 @@
 
 // Minimum subreddit is display_name and _id
 
+const { randomInt } = require('crypto');
 const { connect, ObjectId } = require('./mongo');
 const Submissions = require('./submissions');
 const COLLECTION_NAME = 'subreddits';
@@ -52,6 +53,10 @@ async function deleteAll() {
 }
 
 // Submissions
+async function deleteAllSubmissions() {
+  return await Submissions.deleteAll();
+}
+
 // get all submissions of all subreddits
 async function getAllSubmissions(page = 1, pageSize = 30) {
   return Submissions.getAll(page, pageSize);
@@ -64,13 +69,21 @@ async function getAllSubmissionsOfSubreddit(display_name, page = 1, pageSize = 3
   const subreddit_id = subreddit._id;
   return await Submissions.getAllBySubredditId(subreddit_id, page, pageSize);
 }
-// add a submission to a subreddit
+// add a submission to a subreddit 
 async function addSubmission(display_name, submission) {
   const col = await collection();
-  const subreddit = await col.findOne({ display_name });
-  const subreddit_id = subreddit._id;
+  let subreddit = await col.findOne({ display_name });
+  let subreddit_id = -1
+  if (!subreddit) {
+     subreddit = await createSubreddit(display_name, "/r/" + display_name, randomInt(0,1000000));
+     subreddit_id = subreddit.insertedId;
+  }
+  else {
+    subreddit_id = subreddit._id;
+  }
+  
   return await Submissions.add(subreddit_id, submission);
-}
+} 
 
 module.exports = {
   getAll,
@@ -80,5 +93,6 @@ module.exports = {
   deleteAll,
   getAllSubmissions,
   addSubmission,
-  getAllSubmissionsOfSubreddit
+  getAllSubmissionsOfSubreddit,
+  deleteAllSubmissions
 };
