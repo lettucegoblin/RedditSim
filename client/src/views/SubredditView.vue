@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { type SubmissionsItem, type Subreddit, type SubmissionsItemPending } from '@/model/subreddit'
+import { type SubmissionsItem, type Subreddit } from '@/model/subreddit'
 import SubredditInfoBar from '@/components/SubredditInfoBar.vue'
 import { computed, defineAsyncComponent, ref, type PropType, onMounted, watch } from 'vue'
 import { getSubmissions, getSubredditByName } from '@/model/subreddit'
@@ -33,28 +33,38 @@ console.log('currentSubreddit.value', currentSubreddit.value);
 function dataInit() {
   getSubredditByName(currentSubreddit.value).then((envelope) => {
     subreddit.value = envelope.data;
+    getSubmissions(currentSubreddit.value, page.value, pageSize.value).then((envelope) => {
+      console.log("envelope", envelope);
+      const { data, total } = envelope;
+      toBeGenerated.value = pageSize.value - data.length;
+      if (toBeGenerated.value > 0) {
+        //toBeGenerated.value = 1 // temporary
+      }
+      // add pending items to data
+      const pendingDataArr = [];
+      for (let i = 0; i < toBeGenerated.value; i++) {
+        const pendingData = createPendingSubmission(currentSubreddit.value);
+        pendingDataArr.push(pendingData);
+      }
+
+      console.log("toBeGenerated", toBeGenerated.value)
+      submissions.value = [...pendingDataArr, data].flat();
+    });
   });
 
-  getSubmissions(currentSubreddit.value, page.value, pageSize.value).then((envelope) => {
-    console.log("envelope", envelope);
-    const { data, total } = envelope;
-    toBeGenerated.value = pageSize.value - data.length;
-    // add pending items to data
-    const pendingDataArr = [];
-    for (let i = 0; i < toBeGenerated.value; i++) {
-      const pendingData = {
-        timestamp: Date.now(),
-        pending: true,
-        title: "Loading...",
-      } as SubmissionsItem;
-      pendingDataArr.push(pendingData);
-    }
-
-    console.log("toBeGenerated", toBeGenerated.value)
-    submissions.value = [data, ...pendingDataArr].flat();
-  });
+  
 }
 dataInit();
+
+function createPendingSubmission(subreddit: string): SubmissionsItem {
+  const pendingData = {
+        timestamp: Date.now(),
+        pending: true,
+      } as SubmissionsItem;
+  if (subreddit)
+    pendingData['subreddit'] = subreddit;
+  return pendingData;
+}
 
 
 </script>
@@ -65,6 +75,7 @@ dataInit();
       <div v-for="submission in submissions" :key="submission._id" class="col-span-1">
         <PostListItem :post="submission" />
       </div>
+      
     </div>
     <SubredditInfoBar v-if="subreddit" :subreddit="subreddit" class="hidden md:block w-1/5" />
   </div>

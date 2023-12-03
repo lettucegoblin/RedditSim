@@ -57,6 +57,10 @@ async function deleteAllSubmissions() {
   return await Submissions.deleteAll();
 }
 
+async function getSubmissionById(submissionId) {
+  return await Submissions.get(submissionId);
+}
+
 // get all submissions of all subreddits
 async function getAllSubmissions(page = 1, pageSize = 30) {
   return Submissions.getAll(page, pageSize);
@@ -94,5 +98,6 @@ module.exports = {
   getAllSubmissions,
   addSubmission,
   getAllSubmissionsOfSubreddit,
-  deleteAllSubmissions
+  deleteAllSubmissions,
+  getSubmissionById
 };

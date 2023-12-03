@@ -1,5 +1,5 @@
-const INFERENCE_SERVER = 'http://localhost:5000';
-
+//const INFERENCE_SERVER = 'http://localhost:5000';
+const INFERENCE_SERVER = process.env.INFERENCE_SERVER_URL;
 //http://localhost:5000/reserve_spot
 //  endpoint /reserve_spot
 async function reserve_spot(){

@@ -12,7 +12,7 @@ lastCheckTimestamp = Date.now();
 setInterval(() => {
   if (queue.length > 0 && Date.now() - lastCheckTimestamp > 5000) {
     lastCheckTimestamp = Date.now();
-    console.log("queue", queue, toDo);
+    console.log("queue", queue);
     let id = queue[0];
     if (toDo[id].spot_id) {
       if (toDo[id].status === "done") {
@@ -32,7 +32,7 @@ setInterval(() => {
       }
       toDo[id].spot_id = spot_id;
       inference_submission(spot_id, toDo[id]).then((res) => {
-        console.log(res);
+        console.log("inference_submission", spot_id);
         if (res.postObj) {
           toDo[id].postObj = res.postObj;
           if (!toDo[id].subreddit) {
@@ -49,9 +49,8 @@ setInterval(() => {
             .then((result) => {
               const data = { data: result, isSuccessful: true };
               toDo[id].postObj["_id"] = data.data.insertedId;
-
-              console.log("addSubmission", data);
               toDo[id].status = "done";
+              console.log("addSubmission", toDo[id].postObj["_id"]);
             })
             .catch((err) => {
               console.log("addSubmission", err);
@@ -68,25 +67,30 @@ router
     res.json({ queue, toDo });
   })
   .post("/addSubmission", (req, res, next) => {
-    const { subreddit, author, title, media } = req.body;
+    const { timestamp, subreddit, author, title, media } = req.body;
     console.log(subreddit, author, title, media);
-    const id = uuidv4();
-    queue.push(id);
-    toDo[id] = { subreddit, author, title, media, status: "pending" };
-    res.json({ id, index: queue.indexOf(id), postObj: toDo[id] });
+    const queueId = uuidv4();
+    queue.push(queueId);
+    queueLength = queue.length;
+    toDo[queueId] = { timestamp, subreddit, author, title, media, status: "pending" };
+    res.json({ message: "submitted", queueId, queueLength, queueIndex: queue.indexOf(queueId), postObj: toDo[queueId].postObj });
   })
-  .get("/getSubmission", (req, res, next) => {
-    const { id } = req.query;
-    const submission = toDo[id];
+  .get("/getSubmission", (req, res, next) => { 
+    const { queueId } = req.query;
+    const submission = toDo[queueId];
     if (!submission) {
       res.json({ message: "no submission" });
       return;
     }
     if (submission.status === "pending") {
-      res.json({ index: queue.indexOf(id), ...toDo[id] });
+      queueLength = queue.length;
+      res.json({ message: "pending", queueId, queueLength, queueIndex: queue.indexOf(queueId), postObj: submission.postObj });
+      return;
+    } else if(submission.status === "done") {
+      res.json({ message: "done", postObj: submission.postObj });
       return;
     }
-    res.json({ message: "submission done" });
+    res.json({ message: "error" });
   });
 
 module.exports = router;

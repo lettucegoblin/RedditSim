@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import type { SubmissionsItem } from '@/model/subreddit';
-import { computed, defineProps } from 'vue'
+import { getSubmission, type SubmissionsItem } from '@/model/subreddit';
+import { computed, defineProps, ref } from 'vue'
+import { type SubmissionsItemPending, queueSubmission, getQueueStatus, type SubmissionsItemStatus } from '../model/queueInference';
 
 const props = defineProps({
   post: {
@@ -9,8 +10,54 @@ const props = defineProps({
   }
 })
 
-if(props.post.pending) {
-  console.log('props.post.pending', props.post.pending);
+const submissionToDisplay = ref(props.post);
+
+const pendingSub = ref({} as SubmissionsItemPending);
+const pendingSubStatus = ref({} as SubmissionsItemStatus);
+if (props.post.pending) {
+  console.log('props.post.pending', props.post);
+  const submission = {
+    subreddit: props.post.subreddit,
+    timestamp: props.post.timestamp,
+  } as SubmissionsItemPending;
+  pendingSub.value = submission;
+  
+  queueSubmission(submission).then((subStatus: SubmissionsItemStatus) => {
+    console.log('subStatus', subStatus);
+    pendingSubStatus.value = subStatus;
+    probeStatus()
+  });
+}
+
+function probeStatus() {
+  if (!pendingSubStatus.value.queueId){
+    throw new Error('No queueId');
+    return
+  }
+  getQueueStatus(pendingSubStatus.value.queueId).then((subStatus: SubmissionsItemStatus) => {
+    console.log('subStatus', subStatus);
+    pendingSubStatus.value = subStatus;
+    pendingSub.value = {...subStatus.postObj};
+
+    if (pendingSubStatus.value.message === 'pending') {
+      setTimeout(probeStatus, 1000);
+      console.log('pendingSub.value.status', pendingSub.value.status, pendingSubStatus.value.queueId);
+    } else if (pendingSubStatus.value.message === 'done') {
+      
+      console.log("pendingSub.value", pendingSub.value);
+      submissionToDisplay.value = {
+        ...pendingSub.value,
+        pending: false,
+      } as unknown as SubmissionsItem;
+      /*getSubmission(submissionToDisplay.value.subreddit, pendingSub.value._id).then((envelope) => {
+        console.log('envelope', envelope);
+        submissionToDisplay.value = envelope.data;
+      });*/
+    } else if (pendingSub.value.status === 'no submission') {
+      throw new Error('No submission');
+      return
+    }
+  });
 }
 
 function formatDate(timestamp: number): string {
@@ -20,14 +67,25 @@ function formatDate(timestamp: number): string {
 </script>
 
 <template>
-  <div v-if="!post.pending" class="rounded-2xl p-4 mx-8 mb-4 hover:bg-slate-200 dark:hover:bg-reddit-highlight-dark">
-    <h2>{{ post.title }}</h2>
-    <p>{{ post.text }}</p>
-    <p>Posted by {{ post.author }} on {{ formatDate(post.timestamp) }}</p>
-  </div>
-  <div v-else class="rounded-2xl p-4 mx-8 mb-4 bg-slate-200 dark:bg-reddit-highlight-dark">
-    <h2>Loading...</h2>
-  </div>
+  <article v-if="submissionToDisplay.pending"
+    class="border-dashed border-2 border-light-blue-500 prose md:prose-lg lg:prose-xl rounded-2xl p-4 mx-8 mb-4 hover:bg-slate-200 dark:hover:bg-reddit-highlight-dark">
+    
+    <div class="grayscale dot-bricks relative float-right top-3"></div> <!--loading symbol-->
+    <h2>
+      <div v-if="submissionToDisplay.subreddit"> Generating submission for /r/{{ submissionToDisplay.subreddit }}...</div>
+      <div v-else>Random subreddit...</div>
+      <div v-if="pendingSubStatus.queueId">
+        Queue: {{ pendingSubStatus.queueIndex }}/{{ pendingSubStatus.queueLength }}
+      </div>
+    </h2>
+    
+  </article>
+  <article v-else
+    class="prose md:prose-lg lg:prose-xl rounded-2xl p-4 mx-8 mb-4 hover:bg-slate-200 dark:hover:bg-reddit-highlight-dark">
+    <h2>/r/{{ submissionToDisplay.subreddit }} by {{ submissionToDisplay.author }} on {{ formatDate(submissionToDisplay.timestamp) }}</h2>
+    <h1>{{ submissionToDisplay.title }}</h1>
+    <p>{{ submissionToDisplay.text }}</p>
+  </article>
 </template>
 
 <style scoped>

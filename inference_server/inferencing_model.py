@@ -69,7 +69,7 @@ Assistant:"""
             "Title": {
                 "TAG": "[TITLE]",
                 "CONSTRAINT": lambda x: len(x) > 0 and self.contains_letter(x) and len(x) <= 300,
-                "HELPER": lambda x: x,
+                "HELPER": lambda x: f"{self.gen_valid_first_character(include_digits=True, sometimes_empty=True)}",
                 "MAX_NEW_TOKENS": 300
             },
             "EOS": {
@@ -308,7 +308,9 @@ Assistant: """ #  Undercoverotaku - Was looking for the comment pointing this ou
     def contains_letter(self, s):
         return any(c.isalpha() for c in s)
 
-    def gen_valid_first_character(self, include_digits=True):
+    def gen_valid_first_character(self, include_digits=True, sometimes_empty=False):
+        if sometimes_empty and random.random() < 0.5:
+            return ""
         if include_digits and random.random() < 0.5:
             return random.choice(string.digits)
         return random.choice(string.ascii_letters)

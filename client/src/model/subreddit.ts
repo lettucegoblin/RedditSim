@@ -36,10 +36,7 @@ export interface SubmissionsItem {
   pending: boolean
 }
 
-//submissions item pending
-export interface SubmissionsItemPending {
-  timestamp: number
-}
+
 
 export function getSubreddits(page: number, pageSize: number): Promise<DataListEnvelope<Subreddit>> {
   return myFetch.api('subreddits/all', { page, pageSize });
@@ -53,3 +50,6 @@ export function getSubmissions(subredditName: string, page: number, pageSize: nu
   return myFetch.api(`subreddits/${subredditName}/submissions`, { page, pageSize });
 }
 
+export function getSubmission(subredditName: string, submissionId: string): Promise<DataEnvelope<SubmissionsItem>> {
+  return myFetch.api(`subreddits/${subredditName}/submissions/${submissionId}`);
+}

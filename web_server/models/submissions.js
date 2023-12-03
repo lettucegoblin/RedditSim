@@ -13,6 +13,11 @@ async function getAll(page = 1, pageSize = 30) {
   return { items, total };
 }
 
+async function get(id) {
+  const col = await collection();
+  return await col.findOne({ _id: ObjectId(id) });
+}
+
 async function getAllBySubredditId(subreddit_id, page = 1, pageSize = 30) {
   const col = await collection();
   const subreddit = await col.find({ subreddit_id }).skip((page-1) * pageSize).limit(pageSize).toArray();
@@ -35,5 +40,6 @@ module.exports = {
   getAll,
   getAllBySubredditId,
   add,
-  deleteAll
+  deleteAll,
+  get
 };

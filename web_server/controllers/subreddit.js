@@ -78,6 +78,14 @@ router
       res.json(data);
     }).catch(next);
   })
+  // get submission by id
+  .get("/:subreddit/submissions/:submissionId", (req, res, next) => {
+    const {subreddit, submissionId } = req.params;
+    model.getSubmissionById( submissionId).then((result) => {
+      const data = { data: result, isSuccessful: true };
+      res.json(data);
+    }).catch(next);
+  })
   .post("/:subreddit/submissions", (req, res, next) => {
     const { subreddit } = req.params;
     const { page, pageSize } = req.body;
