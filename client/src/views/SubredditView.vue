@@ -10,8 +10,10 @@ const PostListItem = defineAsyncComponent(() => import('../components/PostListIt
 watch(
   () => route.params.subreddit,
   async newSubreddit => {
-   
+    submissions.value = [];
+    toBeGenerated.value = 0;
     currentSubreddit.value = makeString(newSubreddit);
+    subreddit.value = undefined;
     console.log('currentSubreddit', currentSubreddit.value );
     dataInit();
   }
@@ -25,12 +27,13 @@ const currentSubreddit = ref<string>(makeString(route.params.subreddit));
 const subreddit = ref<Subreddit>();
 const submissions = ref<SubmissionsItem[]>([]);
 const page = ref(1);
-const pageSize = ref(10);
+const pageSize = ref(4);
 
 const toBeGenerated = ref(0);
 
 console.log('currentSubreddit.value', currentSubreddit.value);
 function dataInit() {
+  
   getSubredditByName(currentSubreddit.value).then((envelope) => {
     subreddit.value = envelope.data;
     getSubmissions(currentSubreddit.value, page.value, pageSize.value).then((envelope) => {
@@ -79,7 +82,7 @@ function createPendingSubmission(subreddit: string): SubmissionsItem {
     </div>
     <SubredditInfoBar v-if="subreddit" :subreddit="subreddit" class="hidden md:block w-1/5" />
   </div>
-  <div v-else>Subreddit not found</div>
+  <div v-else>Loading...{{ currentSubreddit }}</div>
 </template>
 
 <style scoped></style>

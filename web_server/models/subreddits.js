@@ -25,7 +25,7 @@ async function collection() {
 
 async function getAll(page = 1, pageSize = 30) {
   const col = await collection();
-  const items = await col.find().skip((page-1) * pageSize).limit(pageSize).toArray();
+  const items = await col.find().sort({ subscribers: -1 }).skip((page-1) * pageSize).limit(pageSize).toArray();
   const total = await col.countDocuments();
   return { items, total };
 }

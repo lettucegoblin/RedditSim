@@ -8,18 +8,26 @@ function valid_subreddit_name(name) {
   return /^[a-zA-Z][a-zA-Z0-9-_]{2,20}$/.test(name);
 }
 
+function createSubredditObj(display_name) {
+  if (!valid_subreddit_name(display_name)) {
+    return { error: "invalid subreddit name" };
+  }
+  path_name = `/r/${display_name}`;
+  // random number of subscribers from 10k to 10mil
+  subscribers = Math.floor(Math.random() * 10000000) + 10000;
+  return { display_name, path_name, subscribers };
+}
+
 router
   .post("/create", (req, res, next) => {
     const { display_name } = req.body;
-    if (!valid_subreddit_name(display_name)) {
-      res.status(400).json({ message: "invalid subreddit name" });
+    subredditObj = createSubredditObj(display_name);
+    if (subredditObj.error) {
+      res.json({ error: subredditObj.error });
       return;
     }
-    path_name = `/r/${display_name}`;
-    // random number of subscribers from 10k to 10mil
-    subscribers = Math.floor(Math.random() * 10000000) + 10000;
     model
-      .createSubreddit(display_name, path_name, subscribers)
+      .createSubreddit(...subredditObj)
       .then((result) => {
         const data = { data: result, isSuccessful: true };
         res.json(data);
@@ -86,10 +94,22 @@ router
       res.json(data);
     }).catch(next);
   })
-  .post("/:subreddit/submissions", (req, res, next) => {
+  .post("/:subreddit/submissions", async (req, res, next) => {
     const { subreddit } = req.params;
     const { page, pageSize } = req.body;
     console.log("/:subreddit/submissions",subreddit);
+    let subredditObj = await model.getByDisplayName(subreddit)
+    if(!subredditObj) {
+
+      // create subreddit
+      subredditObj = createSubredditObj(subreddit);
+      if (subredditObj.error) {
+        res.json({ error: subredditObj.error });
+        return;
+      }
+      await model.createSubreddit(subredditObj.display_name, subredditObj.path_name, subredditObj.subscribers);
+    }
+
     model
       .getAllSubmissionsOfSubreddit(subreddit, page, pageSize)
       .then((result) => {
@@ -102,10 +122,21 @@ router
     const { subreddit, postId } = req.params;
     res.json({ message: `post ${postId} of subreddit ${subreddit}` });
   })
-  .get("/:subreddit", (req, res, next) => {
+  .get("/:subreddit", async (req, res, next) => {
     
     const { subreddit } = req.params;
     console.log("getByDisplayName", subreddit)
+    let subredditObj = await model.getByDisplayName(subreddit)
+    if(!subredditObj) {
+      
+      // create subreddit
+      subredditObj = createSubredditObj(subreddit);
+      if (subredditObj.error) {
+        res.json({ error: subredditObj.error });
+        return;
+      }
+      await model.createSubreddit(subredditObj.display_name, subredditObj.path_name, subredditObj.subscribers);
+    }
     model
       .getByDisplayName(subreddit)
       .then((result) => {

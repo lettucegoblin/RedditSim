@@ -11,7 +11,7 @@ import {
   MenuItem,
   MenuItems
 } from '@headlessui/vue'
-
+import SearchVue from '@/components/Search.vue'
 const darkMode = ref(true)
 
 const toggleDarkMode = () => {
@@ -54,27 +54,7 @@ const navigation = [
               </RouterLink>
             </div>
           </div>
-          <div class="flex flex-1 items-center justify-center">
-            <div class="ml-6 sm:block w-full max-w-screen-md">
-              <div class="flex space-x-4">
-                <div class="relative w-full">
-                  <i class="absolute inset-y-0 left-0 flex items-center pl-2 text-gray-400">
-                    <font-awesome-icon icon="search" class="h-5 w-5" />
-                  </i>
-                  <input
-                    type="text"
-                    class="rounded-3xl h-12 w-full pl-8 pr-3 py-2 text-sm font-medium"
-                    placeholder="Search Reddit"
-                  />
-                </div>
-                <!--
-                  <a v-for="item in navigation" :key="item.name" :href="item.href"
-                    :class="[item.current ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white', 'rounded-md px-3 py-2 text-sm font-medium']"
-                    :aria-current="item.current ? 'page' : undefined">{{ item.name }}</a>
-                    -->
-              </div>
-            </div>
-          </div>
+          <SearchVue searchType="posts" class="ml-6"/>
           <div class="flex static inset-auto ml-6 pr-0">
             <div class="flex items-center space-x-2">
               <button
