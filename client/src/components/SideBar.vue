@@ -4,7 +4,7 @@ import { getSubreddits, type Subreddit } from '@/model/subreddit'
 
 const subreddits = ref<Subreddit[]>([])
 
-getSubreddits().then((envelopeList) => {
+getSubreddits(1, 30).then((envelopeList) => {
   subreddits.value = envelopeList.data
   console.log(subreddits.value)
 })
