@@ -85,4 +85,4 @@ function createPendingSubmission(subreddit: string): SubmissionsItem {
   <div v-else>Loading...{{ currentSubreddit }}</div>
 </template>
 
-<style scoped></style>
+<style scoped></style> 

@@ -81,17 +81,27 @@ function formatDate(timestamp: number): string {
     
   </article>
   <article v-else
-    class="prose md:prose-lg lg:prose-xl rounded-2xl p-4 mx-8 mb-4 hover:bg-slate-200 dark:hover:bg-reddit-highlight-dark">
+    class="max-h-96 prose md:prose-lg lg:prose-xl rounded-2xl p-4 mx-8 mb-4 hover:bg-slate-200 dark:hover:bg-reddit-highlight-dark">
     <h2>/r/{{ submissionToDisplay.subreddit }} by {{ submissionToDisplay.author }} on {{ formatDate(submissionToDisplay.timestamp) }}</h2>
     <h1>{{ submissionToDisplay.title }}</h1>
-    <p>{{ submissionToDisplay.text }}</p>
+    <div class="flex-col h-60 w-auto bg-slate-900 flex justify-center items-center" v-if="submissionToDisplay.media == 'image' || submissionToDisplay.media == 'video'">
+      <h1>{{ submissionToDisplay.media }}</h1>
+      <p >{{ submissionToDisplay.text }}</p>
+    </div> 
+    <p v-else class="post-list-text">{{ submissionToDisplay.text }}</p>
   </article>
 </template>
 
 <style scoped>
-.post-list-item {
-  border: 1px solid #ccc;
-  padding: 1rem;
-  margin-bottom: 1rem;
+.post-list-text {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
+
+.image {
+  width: 100%;
+  height: auto;
+}
+
 </style>

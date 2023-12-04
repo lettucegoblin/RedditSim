@@ -6,11 +6,18 @@ import Search from './Search.vue';
 const subreddits = ref<Subreddit[]>([])
 const subredditsDisplayed = ref<Subreddit[]>([])
 
-getSubreddits(1, 10).then((envelopeList) => {
-  subreddits.value = envelopeList.data
-  subredditsDisplayed.value = subreddits.value
-  console.log(subreddits.value)
-})
+const updateSubredditList = () => {
+  getSubreddits(1, 10).then((envelopeList) => {
+    subreddits.value = envelopeList.data
+    subredditsDisplayed.value = subreddits.value
+    console.log(subreddits.value)
+  })
+}
+updateSubredditList()
+
+const updateSubredditListDelayed = () => {
+  setTimeout(updateSubredditList, 5000)
+}
 
 const subscriberCountToShorthand = (count: number) => {
   if (count < 1000) {
@@ -38,6 +45,7 @@ const searchSubreddits = (_subreddits: Subreddit[], _searchQuery: String) => {
   }
 }
 
+
 //const selectedSubreddit = ref(subreddits[0])
 </script>
 
@@ -52,7 +60,7 @@ const searchSubreddits = (_subreddits: Subreddit[], _searchQuery: String) => {
       <Search searchType="subreddits" v-bind:subreddits="subreddits" @search="searchSubreddits" />
       <ul class="flex flex-col py-4 space-y-1">
         <li v-if="canCreateSubreddit" class="flex items-center px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-gray-100">
-          <RouterLink :to="{ name: 'subreddit', params: { subreddit: searchQuery } }" class="flex items-center">
+          <RouterLink :click="updateSubredditListDelayed" :to="{ name: 'subreddit', params: { subreddit: searchQuery } }" class="flex items-center">
             <font-awesome-icon icon="plus" class="h-4 w-4" />
             <span class="ml-2 text-sm font-medium">Create /r/{{ searchQuery }}</span>
           </RouterLink>
