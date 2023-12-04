@@ -41,10 +41,13 @@ function dataInit() {
     getSubmissions(currentSubreddit.value, page.value, pageSize.value).then((envelope) => {
       console.log("envelope", envelope);
       const { data, total } = envelope;
+      /*
       toBeGenerated.value = pageSize.value - data.length;
       if (toBeGenerated.value > maxToBeGenerated ) {
         toBeGenerated.value = maxToBeGenerated;
-      }
+      }*/
+      if(data.length <= 2)
+        toBeGenerated.value = 2 - data.length;
       // add pending items to data
       const pendingDataArr = [];
       for (let i = 0; i < toBeGenerated.value; i++) {
