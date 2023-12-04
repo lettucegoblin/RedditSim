@@ -4,6 +4,7 @@
 @tailwind utilities;
 
 @layer base {
+  
   html, body{
     @apply h-full;
   }
@@ -46,4 +47,7 @@
   .reddit-divider-color {
     @apply border-slate-200 dark:border-slate-800;
   }
+}
+:root {
+  color-scheme: dark;
 }

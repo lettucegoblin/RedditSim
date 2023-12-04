@@ -10,6 +10,8 @@ const props = defineProps({
   }
 })
 
+const emit = defineEmits(['openSubmissionModal'])
+
 const submissionToDisplay = ref(props.post);
 
 const pendingSub = ref({} as SubmissionsItemPending);
@@ -75,12 +77,14 @@ function formatDate(timestamp: number): string {
       <div v-if="submissionToDisplay.subreddit"> Generating submission for /r/{{ submissionToDisplay.subreddit }}...</div>
       <div v-else>Random subreddit...</div>
       <div v-if="pendingSubStatus.queueId">
-        Queue: {{ pendingSubStatus.queueIndex }}/{{ pendingSubStatus.queueLength }}
+        Queue: {{ pendingSubStatus.queueIndex + 1 }}/{{ pendingSubStatus.queueLength }}
       </div>
     </h2>
     
   </article>
   <article v-else
+    @click="emit('openSubmissionModal', submissionToDisplay)"
+    id="SubmissionListItem"
     class="max-h-96 prose md:prose-lg lg:prose-xl rounded-2xl p-4 mx-8 mb-4 hover:bg-slate-200 dark:hover:bg-reddit-highlight-dark">
     <h2>/r/{{ submissionToDisplay.subreddit }} by {{ submissionToDisplay.author }} on {{ formatDate(submissionToDisplay.timestamp) }}</h2>
     <h1>{{ submissionToDisplay.title }}</h1>
@@ -93,6 +97,10 @@ function formatDate(timestamp: number): string {
 </template>
 
 <style scoped>
+
+#SubmissionListItem {
+  cursor: pointer !important;
+}
 .post-list-text {
   white-space: nowrap;
   overflow: hidden;

@@ -39,8 +39,12 @@ router
     model
       .getAll(page, pageSize)
       .then((result) => {
-        console.log("all", result)
-        const data = { data: result.items, total: result.total, isSuccessful: true };
+        console.log("all", result);
+        const data = {
+          data: result.items,
+          total: result.total,
+          isSuccessful: true,
+        };
         res.json(data);
       })
       .catch(next);
@@ -50,8 +54,12 @@ router
     model
       .getAllSubmissions(page, pageSize)
       .then((result) => {
-        console.log("/all/submissions", result)
-        const data = { data: result.items, total: result.total, isSuccessful: true };
+        console.log("/all/submissions", result);
+        const data = {
+          data: result.items,
+          total: result.total,
+          isSuccessful: true,
+        };
         res.json(data);
       })
       .catch(next);
@@ -66,10 +74,13 @@ router
       .catch(next);
   })
   .get("/deleteAllSubmissions", (req, res, next) => {
-    model.deleteAllSubmissions().then((result) => {
-      const data = { data: result, isSuccessful: true };
-      res.json(data);
-    }).catch(next);
+    model
+      .deleteAllSubmissions()
+      .then((result) => {
+        const data = { data: result, isSuccessful: true };
+        res.json(data);
+      })
+      .catch(next);
   })
   .get("/about", (req, res, next) => {
     const { subreddit } = req.params;
@@ -81,39 +92,52 @@ router
   })
   .post("/:subreddit/submissions/create", (req, res, next) => {
     const { subreddit } = req.params;
-    model.addSubmission(subreddit, req.body).then((result) => {
-      const data = { data: result, isSuccessful: true };
-      res.json(data);
-    }).catch(next);
+    model
+      .addSubmission(subreddit, req.body)
+      .then((result) => {
+        const data = { data: result, isSuccessful: true };
+        res.json(data);
+      })
+      .catch(next);
   })
   // get submission by id
   .get("/:subreddit/submissions/:submissionId", (req, res, next) => {
-    const {subreddit, submissionId } = req.params;
-    model.getSubmissionById( submissionId).then((result) => {
-      const data = { data: result, isSuccessful: true };
-      res.json(data);
-    }).catch(next);
+    const { subreddit, submissionId } = req.params;
+    model
+      .getSubmissionById(submissionId)
+      .then((result) => {
+        const data = { data: result, isSuccessful: true };
+        res.json(data);
+      })
+      .catch(next);
   })
   .post("/:subreddit/submissions", async (req, res, next) => {
     const { subreddit } = req.params;
     const { page, pageSize } = req.body;
-    console.log("/:subreddit/submissions",subreddit);
-    let subredditObj = await model.getByDisplayName(subreddit)
-    if(!subredditObj) {
-
+    console.log("/:subreddit/submissions", subreddit);
+    let subredditObj = await model.getByDisplayName(subreddit);
+    if (!subredditObj) {
       // create subreddit
       subredditObj = createSubredditObj(subreddit);
       if (subredditObj.error) {
         res.json({ error: subredditObj.error });
         return;
       }
-      await model.createSubreddit(subredditObj.display_name, subredditObj.path_name, subredditObj.subscribers);
+      await model.createSubreddit(
+        subredditObj.display_name,
+        subredditObj.path_name,
+        subredditObj.subscribers
+      );
     }
 
     model
       .getAllSubmissionsOfSubreddit(subreddit, page, pageSize)
       .then((result) => {
-        const data = { data: result.subreddit, total: result.total, isSuccessful: true };
+        const data = {
+          data: result.subreddit,
+          total: result.total,
+          isSuccessful: true,
+        };
         res.json(data);
       })
       .catch(next);
@@ -123,19 +147,21 @@ router
     res.json({ message: `post ${postId} of subreddit ${subreddit}` });
   })
   .get("/:subreddit", async (req, res, next) => {
-    
     const { subreddit } = req.params;
-    console.log("getByDisplayName", subreddit)
-    let subredditObj = await model.getByDisplayName(subreddit)
-    if(!subredditObj) {
-      
+    console.log("getByDisplayName", subreddit);
+    let subredditObj = await model.getByDisplayName(subreddit);
+    if (!subredditObj) {
       // create subreddit
       subredditObj = createSubredditObj(subreddit);
       if (subredditObj.error) {
         res.json({ error: subredditObj.error });
         return;
       }
-      await model.createSubreddit(subredditObj.display_name, subredditObj.path_name, subredditObj.subscribers);
+      await model.createSubreddit(
+        subredditObj.display_name,
+        subredditObj.path_name,
+        subredditObj.subscribers
+      );
     }
     model
       .getByDisplayName(subreddit)

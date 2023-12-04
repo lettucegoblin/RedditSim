@@ -7,7 +7,7 @@ const subreddits = ref<Subreddit[]>([])
 const subredditsDisplayed = ref<Subreddit[]>([])
 
 const updateSubredditList = () => {
-  getSubreddits(1, 10).then((envelopeList) => {
+  getSubreddits(1, 500).then((envelopeList) => {
     subreddits.value = envelopeList.data
     subredditsDisplayed.value = subreddits.value
     console.log(subreddits.value)
@@ -50,7 +50,7 @@ const searchSubreddits = (_subreddits: Subreddit[], _searchQuery: String) => {
 </script>
 
 <template>
-  <nav class="flex flex-col w-1/5 border-r reddit-divider-color shadow">
+  <nav class="flex flex-col w-1/5 border-r reddit-divider-color shadow overflow-y-scroll" style="height:60vh">
     
     <div class="flex items-center justify-center h-16 border-b reddit-divider-color">
       <h1 class="text-lg font-bold">Subreddits</h1>
