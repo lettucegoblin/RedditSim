@@ -45,15 +45,18 @@ setInterval(() => {
         ).then((res) => {
           console.log("inference_comments", spot_id);
           if (res.commentPath) {
-            toDo[id].commentPath = res.commentPath;
+            // res.commentPath is in the format of [{formatted: String, text: String, user: String}, ...]
+            // to Do[id].commentPath is in the format of [{_id: ObjectId, submissionId: ObjectId, commentPath: [{_id: ObjectId, formatted: String, text: String, user: String}, ...]}]
+            //toDo[id].commentPath = res.commentPath;
             //toDo[id].status = "done";
             // insert in database
             model
-              .addCommentPath(toDo[id].postObj["_id"], toDo[id].commentPath)
-              .then((result) => {
-                const data = { data: result, isSuccessful: true };
+              .addCommentPath(toDo[id].postObj["_id"], toDo[id].commentPath, res.commentPath)
+              .then((newCommentPath) => {
+                toDo[id].commentPath = newCommentPath;
+
                 toDo[id].status = "done";
-                console.log("addCommentPath", toDo[id].postObj["_id"]);
+                console.log("addCommentPath", newCommentPath);
               })
               .catch((err) => {
                 console.log("addCommentPath", err);
@@ -184,14 +187,17 @@ router
         queueIndex: queue.indexOf(queueId),
         postObj: commentPath.postObj,
         commentPath: commentPath.commentPath,
-        numberOfComments,
+        numberOfComments: commentPath.numberOfComments,
       });
       return;
     } else if (commentPath.status === "done") {
+      const path = JSON.stringify(commentPath.commentPath)
+      console.log(path)
       res.json({
         message: "done",
         postObj: commentPath.postObj,
-        commentPath: commentPath.commentPath,
+        commentPathId: commentPath.commentPath._id,
+        commentPath: commentPath.commentPath.commentPath,
       });
       return;
     }

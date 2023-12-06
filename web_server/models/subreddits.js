@@ -92,9 +92,13 @@ async function addSubmission(display_name, submission) {
 } 
 
 // add a commentPath to a submission
-async function addCommentPath(submissionId, commentPath) {
+async function addCommentPath(submissionId, commentPath, inferencedCommentPath) {
   commentPath.submissionId = submissionId;
-  return await Comments.insertCommentPath(commentPath);
+  return await Comments.insertCommentPath(commentPath, inferencedCommentPath);
+}
+
+async function getCommentPath(submissionId) {
+  return await Comments.getCommentPath(submissionId);
 }
 
 module.exports = {

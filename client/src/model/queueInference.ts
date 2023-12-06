@@ -25,7 +25,21 @@ export interface CommentPathPending {
   commentPath: string[];
   postObj: SubmissionsItem;
   numberOfComments: number;
-  nextUser: string;
+  nextUser?: string;
+}
+
+export interface Comment {
+  _id: string;
+  formatted: string;
+  submissionId: string;
+  text: string;
+  user: string;
+}
+
+export interface CommentPath {
+  _id: string;
+  commentPath: Comment[];
+  submissionId: string;
 }
 
 export interface CommentPathStatus {
@@ -34,7 +48,7 @@ export interface CommentPathStatus {
   queueIndex?: number;
   queueLength?: number;
   postObj: SubmissionsItem;
-  commentPath?: string[];
+  commentPath?: CommentPath;
   numberOfComments?: number;
 }
 /* done

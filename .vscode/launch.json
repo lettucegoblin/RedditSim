@@ -6,7 +6,6 @@
   "configurations": [
     {
       "type": "node",
-      "runtimeExecutable": "/home/lettuce/.nvm/versions/node/v21.1.0/bin/node",
       "request": "launch",
       "name": "Launch Program",
       "skipFiles": [
