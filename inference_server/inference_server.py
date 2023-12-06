@@ -52,11 +52,15 @@ def generate_comments():
     global reserved_spot_id
     if model.is_generating():
         return jsonify({'error': 'model is currently generating'})
-    postObj = request.json.get('postObj')
-    commentPath = request.json.get('commentPath')
-    next_user = request.json.get('nextUser')
+    postObj = request.json.get('postObj') # required postObj
+    commentPath = request.json.get('commentPath') # optional commentPath, default is empty list
+    numberOfComments = request.json.get('numberOfComments') # optional numberOfComments, default is 5
+    next_user = request.json.get('nextUser') # optional next_user, default is empty string
     if not all(key in postObj for key in optional_post_keys): # check if postObj has all required keys
         return jsonify({'error': 'postObj does not have the correct format'})
+
+    if not isinstance(numberOfComments, int):
+        return jsonify({'error': 'numberOfComments does not have the correct format'})
 
     # sanitize commentPath
     commentPath = commentPath if commentPath else []
@@ -75,7 +79,7 @@ def generate_comments():
         return jsonify({'error': 'nextUser does not have the correct format'})
     if not model.is_loaded():
         model.load_model()
-    comments = model.generate_comments(postObj, commentPath, next_user, 5)
+    comments = model.generate_comments(postObj, commentPath, next_user, numberOfComments)
     reserved_spot_id = -1
     return jsonify({'commentPath': comments})
 

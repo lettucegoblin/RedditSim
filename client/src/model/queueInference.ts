@@ -1,5 +1,6 @@
 import * as myFetch from './myFetch';
 import type { DataEnvelope, DataListEnvelope } from './myFetch';
+import type { SubmissionsItem } from './subreddit';
 
 //submissions item pending
 export interface SubmissionsItemPending {
@@ -19,10 +20,40 @@ export interface SubmissionsItemStatus {
   postObj: SubmissionsItemPending;
 }
 
+//commentPath, postObj, numberOfComments, nextUser
+export interface CommentPathPending {
+  commentPath: string[];
+  postObj: SubmissionsItem;
+  numberOfComments: number;
+  nextUser: string;
+}
+
+export interface CommentPathStatus {
+  message: string;
+  queueId?: string;
+  queueIndex?: number;
+  queueLength?: number;
+  postObj: SubmissionsItem;
+  commentPath?: string[];
+  numberOfComments?: number;
+}
+/* done
+ message: "done",
+ postObj: commentPath.postObj,
+ commentPath: commentPath.commentPath,
+*/
+// queueComment
+export function queueCommentPath(comment: CommentPathPending): Promise<CommentPathStatus> {
+  return myFetch.api('queue/addCommentPath', comment);
+}
+export function getQueueCommentPathStatus(queueId: string): Promise<CommentPathStatus> {
+  return myFetch.api(`queue/getCommentPath?queueId=${queueId}`);
+}
+
 export function queueSubmission(submission: SubmissionsItemPending): Promise<SubmissionsItemStatus> {
   return myFetch.api('queue/addSubmission', submission);
 }
 
-export function getQueueStatus(queueId: string): Promise<SubmissionsItemStatus> {
+export function getSubmissionStatus(queueId: string): Promise<SubmissionsItemStatus> {
   return myFetch.api(`queue/getSubmission?queueId=${queueId}`);
 }

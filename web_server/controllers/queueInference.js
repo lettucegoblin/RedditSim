@@ -4,7 +4,11 @@ const router = express.Router();
 const { v4: uuidv4 } = require("uuid");
 const model = require("../models/subreddits");
 
-const { inference_submission, reserve_spot } = require("../models/inference");
+const {
+  inference_submission,
+  inference_comments,
+  reserve_spot,
+} = require("../models/inference");
 
 queue = [];
 toDo = {};
@@ -20,7 +24,7 @@ setInterval(() => {
         if (queue.length == 0) return;
         id = queue[0];
       } else {
-        // still pending
+        // still pending, check again later
         return;
       }
     }
@@ -31,33 +35,62 @@ setInterval(() => {
         return;
       }
       toDo[id].spot_id = spot_id;
-      inference_submission(spot_id, toDo[id]).then((res) => {
-        console.log("inference_submission", spot_id);
-        if (res.postObj) {
-          toDo[id].postObj = res.postObj;
-          if (!toDo[id].subreddit) {
-            let newSubreddit = toDo[id].postObj["subreddit"];
-            // remove the /r/ from the subreddit name if it exists
-            if (newSubreddit.startsWith("/r/")) {
-              newSubreddit = newSubreddit.substring(3);
-            }
-            toDo[id].subreddit = newSubreddit;
+      if (toDo[id].type === "commentPath") {
+        inference_comments(
+          spot_id,
+          toDo[id].postObj,
+          toDo[id].nextUser,
+          toDo[id].numberOfComments,
+          toDo[id].commentPath
+        ).then((res) => {
+          console.log("inference_comments", spot_id);
+          if (res.commentPath) {
+            toDo[id].commentPath = res.commentPath;
+            //toDo[id].status = "done";
+            // insert in database
+            model
+              .addCommentPath(toDo[id].postObj["_id"], toDo[id].commentPath)
+              .then((result) => {
+                const data = { data: result, isSuccessful: true };
+                toDo[id].status = "done";
+                console.log("addCommentPath", toDo[id].postObj["_id"]);
+              })
+              .catch((err) => {
+                console.log("addCommentPath", err);
+                toDo[id].status = "done";
+              });
+            
           }
-          toDo[id].postObj["timestamp"] = Date.now();
-          model
-            .addSubmission(toDo[id].subreddit, toDo[id].postObj)
-            .then((result) => {
-              const data = { data: result, isSuccessful: true };
-              toDo[id].postObj["_id"] = data.data.insertedId;
-              toDo[id].status = "done";
-              console.log("addSubmission", toDo[id].postObj["_id"]);
-            })
-            .catch((err) => {
-              console.log("addSubmission", err);
-              toDo[id].status = "done";
-            });
-        }
-      });
+        });
+      } else {
+        inference_submission(spot_id, toDo[id]).then((res) => {
+          console.log("inference_submission", spot_id);
+          if (res.postObj) {
+            toDo[id].postObj = res.postObj;
+            if (!toDo[id].subreddit) {
+              let newSubreddit = toDo[id].postObj["subreddit"];
+              // remove the /r/ from the subreddit name if it exists
+              if (newSubreddit.startsWith("/r/")) {
+                newSubreddit = newSubreddit.substring(3);
+              }
+              toDo[id].subreddit = newSubreddit;
+            }
+            toDo[id].postObj["timestamp"] = Date.now();
+            model
+              .addSubmission(toDo[id].subreddit, toDo[id].postObj)
+              .then((result) => {
+                const data = { data: result, isSuccessful: true };
+                toDo[id].postObj["_id"] = data.data.insertedId;
+                toDo[id].status = "done";
+                console.log("addSubmission", toDo[id].postObj["_id"]);
+              })
+              .catch((err) => {
+                console.log("addSubmission", err);
+                toDo[id].status = "done";
+              });
+          }
+        });
+      }
     });
   }
 }, 5000);
@@ -72,10 +105,24 @@ router
     const queueId = uuidv4();
     queue.push(queueId);
     queueLength = queue.length;
-    toDo[queueId] = { timestamp, subreddit, author, title, media, status: "pending" };
-    res.json({ message: "submitted", queueId, queueLength, queueIndex: queue.indexOf(queueId), postObj: toDo[queueId].postObj });
+    toDo[queueId] = {
+      type: "submission",
+      timestamp,
+      subreddit,
+      author,
+      title,
+      media,
+      status: "pending",
+    };
+    res.json({
+      message: "submitted",
+      queueId,
+      queueLength,
+      queueIndex: queue.indexOf(queueId),
+      postObj: toDo[queueId].postObj,
+    });
   })
-  .get("/getSubmission", (req, res, next) => { 
+  .get("/getSubmission", (req, res, next) => {
     const { queueId } = req.query;
     const submission = toDo[queueId];
     if (!submission) {
@@ -84,10 +131,68 @@ router
     }
     if (submission.status === "pending") {
       queueLength = queue.length;
-      res.json({ message: "pending", queueId, queueLength, queueIndex: queue.indexOf(queueId), postObj: submission.postObj });
+      res.json({
+        message: "pending",
+        queueId,
+        queueLength,
+        queueIndex: queue.indexOf(queueId),
+        postObj: submission.postObj,
+      });
       return;
-    } else if(submission.status === "done") {
+    } else if (submission.status === "done") {
       res.json({ message: "done", postObj: submission.postObj });
+      return;
+    }
+    res.json({ message: "error" });
+  })
+  .post("/addCommentPath", (req, res, next) => {
+    let { commentPath, postObj, numberOfComments, nextUser } = req.body;
+    const queueId = uuidv4();
+    queue.push(queueId);
+    queueLength = queue.length;
+    numberOfComments = numberOfComments ?? 1;
+    toDo[queueId] = {
+      type: "commentPath",
+      commentPath,
+      postObj,
+      numberOfComments,
+      nextUser,
+      status: "pending",
+    };
+    res.json({
+      message: "submitted",
+      queueId,
+      queueLength,
+      queueIndex: queue.indexOf(queueId),
+      postObj: toDo[queueId].postObj,
+      numberOfComments,
+    });
+  })
+  .get("/getCommentPath", (req, res, next) => {
+    const { queueId } = req.query;
+    const commentPath = toDo[queueId];
+    if (!commentPath) {
+      res.json({ message: "no commentPath" });
+      return;
+    }
+    if (commentPath.status === "pending") {
+      queueLength = queue.length;
+      res.json({
+        message: "pending",
+        queueId,
+        queueLength,
+        queueIndex: queue.indexOf(queueId),
+        postObj: commentPath.postObj,
+        commentPath: commentPath.commentPath,
+        numberOfComments,
+      });
+      return;
+    } else if (commentPath.status === "done") {
+      res.json({
+        message: "done",
+        postObj: commentPath.postObj,
+        commentPath: commentPath.commentPath,
+      });
       return;
     }
     res.json({ message: "error" });

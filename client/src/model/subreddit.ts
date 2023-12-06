@@ -53,3 +53,4 @@ export function getSubmissions(subredditName: string, page: number, pageSize: nu
 export function getSubmission(subredditName: string, submissionId: string): Promise<DataEnvelope<SubmissionsItem>> {
   return myFetch.api(`subreddits/${subredditName}/submissions/${submissionId}`);
 }
+

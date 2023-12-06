@@ -33,11 +33,34 @@ async function inference_submission(spot_id, postObj = {}){
   json = await response.json();
   console.log("inference_submission response", json) 
   // return the response
-  return json
-  
+  return json 
+}
+
+//  endpoint /generate_comments
+async function inference_comments(spot_id, postObj, nextUser = "", numberOfComments=1, commentPath = []){ 
+  console.log("inference_comments", spot_id, postObj)
+  // send POST request to inference server at /generate_comments 
+  const response = await fetch(`${INFERENCE_SERVER}/generate_comments`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json' 
+    },
+    body: JSON.stringify({
+      postObj,
+      spot_id,
+      numberOfComments,
+      nextUser,
+      commentPath
+    })
+  });
+  json = await response.json();
+  console.log("inference_comments response", json) 
+  // return the response
+  return json 
 }
 
 module.exports = {
   inference_submission,
-  reserve_spot
+  reserve_spot,
+  inference_comments
 }

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { getSubmission, type SubmissionsItem } from '@/model/subreddit';
 import { computed, defineProps, ref } from 'vue'
-import { type SubmissionsItemPending, queueSubmission, getQueueStatus, type SubmissionsItemStatus } from '../model/queueInference';
+import { type SubmissionsItemPending, queueSubmission, getSubmissionStatus, type SubmissionsItemStatus } from '../model/queueInference';
 
 const props = defineProps({
   post: {
@@ -36,7 +36,7 @@ function probeStatus() {
     throw new Error('No queueId');
     return
   }
-  getQueueStatus(pendingSubStatus.value.queueId).then((subStatus: SubmissionsItemStatus) => {
+  getSubmissionStatus(pendingSubStatus.value.queueId).then((subStatus: SubmissionsItemStatus) => {
     console.log('subStatus', subStatus);
     pendingSubStatus.value = subStatus;
     pendingSub.value = {...subStatus.postObj};

@@ -16,6 +16,8 @@
 const { randomInt } = require('crypto');
 const { connect, ObjectId } = require('./mongo');
 const Submissions = require('./submissions');
+const Comments = require('./comments');
+
 const COLLECTION_NAME = 'subreddits';
 
 async function collection() {
@@ -89,6 +91,12 @@ async function addSubmission(display_name, submission) {
   return await Submissions.add(subreddit_id, submission);
 } 
 
+// add a commentPath to a submission
+async function addCommentPath(submissionId, commentPath) {
+  commentPath.submissionId = submissionId;
+  return await Comments.insertCommentPath(commentPath);
+}
+
 module.exports = {
   getAll,
   getById,
@@ -99,5 +107,6 @@ module.exports = {
   addSubmission,
   getAllSubmissionsOfSubreddit,
   deleteAllSubmissions,
-  getSubmissionById
+  getSubmissionById,
+  addCommentPath
 };

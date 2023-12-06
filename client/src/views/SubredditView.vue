@@ -84,7 +84,7 @@ const submissionModal = ref({} as SubmissionsItem);
 
 
 function openSubmissionModal(submission: SubmissionsItem) {
-  console.log('openSubmissionModal', submission);
+  console.log('openSubmissionModal', JSON.stringify(submission));
   submissionModal.value = submission;
   submissionModalVisible.value = true;
 }
