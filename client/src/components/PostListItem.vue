@@ -10,7 +10,7 @@ const props = defineProps({
   }
 })
 
-const emit = defineEmits(['openSubmissionModal'])
+const emit = defineEmits(['openSubmissionModal', 'updatePendingStatus', 'solidifySubmission'])
 
 const submissionToDisplay = ref(props.post);
 
@@ -21,6 +21,8 @@ if (props.post.pending) {
   const submission = {
     subreddit: props.post.subreddit,
     timestamp: props.post.timestamp,
+    media: props.post.media,
+    title: props.post.title,
   } as SubmissionsItemPending;
   pendingSub.value = submission;
   
@@ -29,6 +31,8 @@ if (props.post.pending) {
     pendingSubStatus.value = subStatus;
     probeStatus()
   });
+} else {
+  console.log('else', props.post);
 }
 
 function probeStatus() {
@@ -51,6 +55,9 @@ function probeStatus() {
         ...pendingSub.value,
         pending: false,
       } as unknown as SubmissionsItem;
+      debugger;
+      emit('updatePendingStatus');
+      emit('solidifySubmission', submissionToDisplay.value)
       /*getSubmission(submissionToDisplay.value.subreddit, pendingSub.value._id).then((envelope) => {
         console.log('envelope', envelope);
         submissionToDisplay.value = envelope.data;
@@ -89,8 +96,12 @@ function formatDate(timestamp: number): string {
     <h2>/r/{{ submissionToDisplay.subreddit }} by {{ submissionToDisplay.author }} on {{ formatDate(submissionToDisplay.timestamp) }}</h2>
     <h1>{{ submissionToDisplay.title }}</h1>
     <div class="flex-col h-60 w-auto bg-slate-900 flex justify-center items-center" v-if="submissionToDisplay.media == 'image' || submissionToDisplay.media == 'video'">
-      <h1>{{ submissionToDisplay.media }}</h1>
-      <p >{{ submissionToDisplay.text }}</p>
+      <img v-if="submissionToDisplay.image" class="image" :src="'data:image/png;base64,'+submissionToDisplay.image" />
+      <div v-else>
+        <h1>{{ submissionToDisplay.media }}</h1>
+        <p >{{ submissionToDisplay.text }}</p>
+      </div>
+      
     </div> 
     <p v-else class="post-list-text">{{ submissionToDisplay.text }}</p>
   </article>
@@ -108,8 +119,8 @@ function formatDate(timestamp: number): string {
 }
 
 .image {
-  width: 100%;
-  height: auto;
+  width: auto;
+  height: 100%;
 }
 
 </style>

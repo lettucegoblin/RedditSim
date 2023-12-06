@@ -38,6 +38,7 @@ export interface SubmissionsItem {
   subreddit: string
   timestamp: number
   text: string
+  image?: string
   upvotes: number
   downvotes: number
   comments: Comment[]

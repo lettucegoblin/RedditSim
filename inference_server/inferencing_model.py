@@ -2,6 +2,8 @@
 from string import Template
 import string
 import random
+import requests
+import json
 
 from exllamav2 import (
     ExLlamaV2,
@@ -146,6 +148,27 @@ Assistant:"""
             if len(output) <= 3:
                 output = ""
         return output
+    def generate_image(self, new_post, width=512, height=512):
+        url = 'http://127.0.0.1:7860/sdapi/v1/txt2img'
+        headers = {
+            'accept': 'application/json',
+            'Content-Type': 'application/json',
+        }
+        data = { # TODO: add more options; sampler, temperature, top_p, etc.
+            'prompt': f"{new_post['title']} by {new_post['author']}, {new_post['subreddit']}, {new_post['media']} ,{new_post['text']}",
+            'steps': 25,
+            'width': width,
+            'height': height,
+        }
+        response = requests.post(url, headers=headers, data=json.dumps(data))
+        if response.status_code == 200:
+            return response.json()["images"][0]
+        else:
+            print(response.json())
+            return ""
+        # The response of the POST request is stored in the `response` variable.
+        # You can access the response data as a JSON object with `response.json()`.
+
     def generate_post(self, **options):
         self.isGenerating = True
         default_options = {

@@ -106,7 +106,7 @@ const updateCommentPathStatus = () => {
           v-for="commentPath in completedPaths"
           :key="commentPath._id"
         >
-          <div v-for="(comment, index) in commentPath.path" :key="comment._id">
+          <div v-for="(comment, index) in commentPath.commentPath" :key="comment._id">
             <div class="comment" :style="{ marginLeft: `${Number(index) * 20}px` }">
               <h1>{{ comment.user }}</h1>
               <p>{{ comment.text }}</p>

@@ -54,7 +54,7 @@ async function getCommentPathsRoots(submissionId) {
   commentPaths = [];
   const col = await collection("comments");
   for await (let commentPath of commentPathIds) {
-    commentPath.path = await col.find({ _id: { $in: commentPath.path } }).toArray();
+    commentPath.commentPath = await col.find({ _id: { $in: commentPath.path } }).toArray();
     commentPaths.push(commentPath);
   }
 

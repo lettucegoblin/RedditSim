@@ -4,11 +4,27 @@ from flask import request
 import time
 import random
 
+TESTING = True
 app = Flask(__name__)
 model = InferencingModel()
 
 reserved_spot_id = -1 # -1 means no spot is reserved
 reserved_spot_timestamp = -1
+
+def calculate_dimensions(aspect_ratio, max_width, max_height):
+    # Aspect ratio is defined as width/height
+    # So, we start by setting width to max_width and calculate height
+    width = max_width
+    height = width / aspect_ratio
+
+    # If calculated height is greater than max_height, we need to adjust
+    if height > max_height:
+        # Set height to max_height and calculate width accordingly
+        height = max_height
+        width = height * aspect_ratio
+
+    # Return width and height as integers
+    return int(width), int(height)
 
 def is_reserved_spot_still_valid():
     global reserved_spot_timestamp
@@ -28,11 +44,11 @@ def attempt_reserve_spot():
 optional_post_keys = ['subreddit', 'author', 'media', 'title']
 @app.route('/generate_post', methods=['POST']) # curl -X POST -H "Content-Type: application/json" -d '{"genPostObj": {"subreddit": "/r/AskReddit", "author": "pikachu_daddy", "media": "text", "title": "1962 Volkswagen Beetle"}}' http://localhost:5000/generate_post
 def generate_post():
-    global reserved_spot_id
+    global reserved_spot_id, TESTING
     if model.is_generating():
         return jsonify({'error': 'model is currently generating'})
     spot_id = request.json.get('spot_id')
-    if spot_id != reserved_spot_id or spot_id == -1:
+    if not TESTING and (spot_id != reserved_spot_id or spot_id == -1):
         return jsonify({'error': 'spot_id is not reserved'})
     postObj = request.json.get('postObj') 
     # if postObj is not a dictionary make it an empty dictionary
@@ -43,8 +59,37 @@ def generate_post():
     if not model.is_loaded():
         model.load_model()
     new_post = model.generate_post(**options)
+    # if new post is image or video, generate image 
+    if new_post['media'] == 'image' or new_post['media'] == 'video':
+        aspect_ratios = [
+            1/1, # square
+            4/3, 3/2, 16/9, # horizontal
+            3/4, 2/3, 9/16 # vertical
+        ]
+        aspect_ratio = random.choice(aspect_ratios)
+        width, height = calculate_dimensions(aspect_ratio, 512, 512)
+        print (width, height)
+        new_post['image'] = model.generate_image(new_post, width, height)
     reserved_spot_id = -1
     return jsonify({'postObj': new_post})
+
+# route for generating an image from a post
+@app.route('/generate_image', methods=['POST']) # curl -X POST -H "Content-Type: application/json" -d '{"postObj": {"subreddit": "/r/AskReddit", "author": "pikachu_daddy", "media": "text", "title": "1962 Volkswagen Beetle"}}' http://localhost:5000/generate_image
+def generate_image():
+    global TESTING
+    if not TESTING:
+        return jsonify({'error': 'not allowed to generate image'})
+    postObj = request.json.get('postObj')
+    aspect_ratios = [
+        1/1, # square
+        4/3, 3/2, 16/9, # horizontal
+        3/4, 2/3, 9/16 # vertical
+    ]
+    aspect_ratio = random.choice(aspect_ratios)
+    width, height = calculate_dimensions(aspect_ratio, 512, 512)
+    print (width, height)
+    image = model.generate_image(postObj, width, height)
+    return jsonify({'image': image})
 
 required_comment_keys = ['user', 'text']
 @app.route('/generate_comments', methods=['POST']) # curl -X POST -H "Content-Type: application/json" -d '{"postObj":{"author":"pikachu_daddy","media":"text","postPrompt":"You are a Reddit post generator.\nUser: \nSubreddit: /r/AskReddit \nAuthor: pikachu_daddy \nMedia: text \nTitle: 1962 Volkswagen Beetle \nWrite the Reddit post.\nAssistant:","subreddit":"/r/AskReddit","text":" \nMy dad bought this car in 1970 for $500 and he still has it today at age 84. He\u2019s had to replace some parts (like the engine) but everything else is original including the paint job! I think my mom wants him to sell it once he can no longer drive, but I hope not because it would be like selling family history.\nEdit: Thank you all so much for your kind words! My parents have been married for over 54 years now and they met back when he was working on his first VW Bug. They both love cars and my dad even worked as an auto mechanic before going into teaching. It\u2019s really amazing that he\u2019s kept this one for so long!","title":"1962 Volkswagen Beetle"}}' http://localhost:5000/generate_comments

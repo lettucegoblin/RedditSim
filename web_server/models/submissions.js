@@ -5,6 +5,39 @@ async function collection() {
   const db = await connect();
   return db.collection(COLLECTION_NAME);
 }
+const INFERENCE_SERVER = process.env.INFERENCE_SERVER_URL;
+async function seedAllWithImages() { // for testing doesn't work without development server
+  console.log("seeding all submissions with images")
+  const allSubmissions = await getAll(1,2000);
+  const col = await collection();
+  // for each submission that has media set to image or video
+  for (let submission of allSubmissions.items) {
+    if (submission.media === "image" || submission.media === "video") {
+      //if(submission.image) continue; // skip if already has image
+      // get image from inference server
+      const image = await genImage(submission);
+      // add image to submission
+      await col.updateOne({ _id: submission._id }, { $set: { image } });
+    }
+  }
+  
+}
+//seedAllWithImages()
+async function genImage(postObj) {
+  const response = await fetch(`${INFERENCE_SERVER}/generate_image`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json' 
+    },
+    body: JSON.stringify({
+      postObj
+    })
+  });
+  json = await response.json();
+  console.log("inference_submission response", json) 
+  // return the response
+  return json['image']
+}
 
 async function getAll(page = 1, pageSize = 30) {
   const col = await collection();
