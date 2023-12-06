@@ -97,8 +97,12 @@ async function addCommentPath(submissionId, commentPath, inferencedCommentPath) 
   return await Comments.insertCommentPath(commentPath, inferencedCommentPath);
 }
 
-async function getCommentPath(submissionId) {
-  return await Comments.getCommentPath(submissionId);
+async function getCommentPath(submissionId, commentPathId) {
+  return await Comments.getCommentPath(submissionId, commentPathId);
+}
+//getCommentPathsRoots
+async function getCommentPathsRoots(submissionId) {
+  return await Comments.getCommentPathsRoots(submissionId);
 }
 
 module.exports = {
@@ -112,5 +116,7 @@ module.exports = {
   getAllSubmissionsOfSubreddit,
   deleteAllSubmissions,
   getSubmissionById,
-  addCommentPath
+  addCommentPath,
+  getCommentPath,
+  getCommentPathsRoots
 };

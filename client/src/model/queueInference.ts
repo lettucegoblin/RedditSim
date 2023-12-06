@@ -1,6 +1,6 @@
 import * as myFetch from './myFetch';
 import type { DataEnvelope, DataListEnvelope } from './myFetch';
-import type { SubmissionsItem } from './subreddit';
+import type { SubmissionsItem, Comment, CommentPath } from './subreddit';
 
 //submissions item pending
 export interface SubmissionsItemPending {
@@ -28,19 +28,6 @@ export interface CommentPathPending {
   nextUser?: string;
 }
 
-export interface Comment {
-  _id: string;
-  formatted: string;
-  submissionId: string;
-  text: string;
-  user: string;
-}
-
-export interface CommentPath {
-  _id: string;
-  commentPath: Comment[];
-  submissionId: string;
-}
 
 export interface CommentPathStatus {
   message: string;

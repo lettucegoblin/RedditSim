@@ -89,6 +89,22 @@ router
   .get("/comments/:commentId", (req, res, next) => {
     const { subreddit, commentId } = req.params;
     res.json({ message: `comment ${commentId} of subreddit ${subreddit}` });
+  })   //comments/list/656c0329eb07c3872bd6d9cf
+  .get("/comments/list/:submissionid", (req, res, next) => {
+    const {  submissionid } = req.params;
+    model.getCommentPathsRoots(submissionid).then((commentPaths) => {
+      const data = { data: commentPaths, isSuccessful: true };
+      res.json(data);
+    })
+    .catch(next);
+  })
+  .get("/comments/:submissionid/:commentPathId", (req, res, next) => {
+    const {  submissionid, commentPathId } = req.params;
+    model.getCommentPath(submissionid, commentPathId).then((commentPaths) => {
+      const data = { data: commentPaths, isSuccessful: true };
+      res.json(data);
+    })
+    .catch(next);
   })
   .post("/:subreddit/submissions/create", (req, res, next) => {
     const { subreddit } = req.params;

@@ -25,24 +25,53 @@ async function insertComment(comment) {
   // change submissionId to ObjectId
   // check if submissionId is a string
   if (typeof comment.submissionId === "string")
-    comment.submissionId = ObjectId(comment.submissionId);
+    comment.submissionId = new ObjectId(comment.submissionId);
   // change userId to ObjectId
   if (comment.userId) {
     if (typeof comment.userId === "string")
-      comment.userId = ObjectId(comment.userId);
+      comment.userId = new ObjectId(comment.userId);
   }
   const filter = { _id: comment._id };
   return await col.updateOne(filter, { $set: comment }, { upsert: true });
 }
 
 // getCommentPath
-async function getCommentPath(submissionId) {
+async function getCommentPathIds(submissionId, commentPathId) {
   const col = await collection("commentPaths");
   // change submissionId to ObjectId
-  if (typeof submissionId === "string") submissionId = ObjectId(submissionId);
-  const commentPath = await col.findOne({ submissionId });
+  if (typeof submissionId === "string") submissionId = new ObjectId(submissionId);
+  if (typeof commentPathId === "string") commentPathId = new ObjectId(commentPathId);
+  const commentPath = await col.findOne({ _id: commentPathId, submissionId });
   return commentPath;
 }
+
+//getCommentPathsRoots
+async function getCommentPathsRoots(submissionId) {
+  const colPaths = await collection("commentPaths");
+  // change submissionId to ObjectId
+  if (typeof submissionId === "string") submissionId = new ObjectId(submissionId);
+  let commentPathIds = await colPaths.find({ submissionId });
+  commentPaths = [];
+  const col = await collection("comments");
+  for await (let commentPath of commentPathIds) {
+    commentPath.path = await col.find({ _id: { $in: commentPath.path } }).toArray();
+    commentPaths.push(commentPath);
+  }
+
+  return commentPaths;
+}
+
+// using an aggregate on each of the commentIds, get the comments
+async function getCommentPath(submissionId, commentPathId) {
+  let commentPathIds = await getCommentPathIds(submissionId, commentPathId);
+  const col = await collection("comments");
+  
+  // Use the $in operator to find all comments with an _id in commentPathIds.path
+  commentPathIds.path = await col.find({ _id: { $in: commentPathIds.path } }).toArray();
+
+  return commentPathIds;
+}
+
 
 
 async function insertCommentPath(commentPathObj, inferencedCommentPath) {
@@ -86,4 +115,7 @@ async function insertCommentPath(commentPathObj, inferencedCommentPath) {
 module.exports = {
   insertComment,
   insertCommentPath,
+  getCommentPath,
+  getCommentPathIds,
+  getCommentPathsRoots,
 };

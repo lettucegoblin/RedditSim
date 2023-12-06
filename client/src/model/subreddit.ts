@@ -14,11 +14,19 @@ export interface Subreddit {
   moderators: { id: number; name: string }[];
 };
 
-export interface CommentItem {
-  id: number
-  author: string
-  timestamp: number
-  content: string
+
+export interface Comment {
+  _id: string;
+  formatted: string;
+  submissionId: string;
+  text: string;
+  user: string;
+}
+
+export interface CommentPath {
+  _id: string;
+  commentPath: Comment[];
+  submissionId: string;
 }
 
 export interface SubmissionsItem {
@@ -32,7 +40,7 @@ export interface SubmissionsItem {
   text: string
   upvotes: number
   downvotes: number
-  comments: CommentItem[]
+  comments: Comment[]
   pending: boolean
 }
 
@@ -54,3 +62,6 @@ export function getSubmission(subredditName: string, submissionId: string): Prom
   return myFetch.api(`subreddits/${subredditName}/submissions/${submissionId}`);
 }
 
+export function getCommentPathsBySubmissionId(submissionId: string): Promise<DataListEnvelope<CommentPath>> {
+  return myFetch.api(`subreddits/comments/list/${submissionId}`);
+}

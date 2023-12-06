@@ -1,14 +1,14 @@
 <script setup lang="ts">
 import type { SubmissionsItem } from '@/model/subreddit'
-import { ref } from 'vue'
+import { getCommentPathsBySubmissionId, type Comment, type CommentPath } from '@/model/subreddit'
+import { onMounted, ref } from 'vue'
 import {
-  type Comment,
-  type CommentPath,
   type CommentPathPending,
   type CommentPathStatus,
   queueCommentPath,
   getQueueCommentPathStatus
 } from '@/model/queueInference'
+import type {  DataListEnvelope } from '@/model/myFetch'
 
 
 const props = defineProps({
@@ -21,29 +21,27 @@ const props = defineProps({
 const post = ref(props.post)
 const emit = defineEmits(['hideSubmissionModal'])
 
+onMounted(() => {
+  console.log('onMounted')
+  if (post.value._id === undefined) {
+    throw new Error('post.value._id is undefined')
+  }
+  getCommentPathsBySubmissionId(String(post.value._id)).then(
+    (envelope: DataListEnvelope<CommentPath>) => {
+      console.log('commentPaths', envelope.data)
+      completedPaths.value.push(...envelope.data)
+    }
+  )
+})
 const hideSubmissionModal = () => {
   console.log('hideSubmissionModal')
   emit('hideSubmissionModal')
 }
-interface CommentManager {
-  pending: [
-    {
-      CommentPath: CommentPathPending
-      CommentPathStatus: CommentPathStatus
-    }
-  ]
-  completed: CommentPath[]
-}
 
-const commentManager = ref({} as CommentManager)
-commentManager.value.pending = [] as any as [
-  {
-    CommentPath: CommentPathPending
-    CommentPathStatus: CommentPathStatus
-  }
-]
-commentManager.value.completed = [] as any as CommentPath[]
-const commentPaths = ref([] as CommentPathPending[])
+//const pendingPaths = ref([] as CommentPathPending[])
+const pendingPathsStatus = ref([] as CommentPathStatus[])
+const completedPaths = ref([] as CommentPath[])
+
 const generateComment = () => {
   console.log('generateComment', post.value)
   const commentPath = {
@@ -52,36 +50,32 @@ const generateComment = () => {
     numberOfComments: Math.floor(Math.random() * 4) + 1 // 1-4
     //nextUser: 'lettuce'
   } as CommentPathPending
-  commentPaths.value.push(commentPath)
+  //pendingPaths.value.push(commentPath)
   queueCommentPath(commentPath).then((commentPathStatus: CommentPathStatus) => {
     console.log('commentPathStatus', commentPathStatus)
+    pendingPathsStatus.value.push(commentPathStatus)
 
-    commentManager.value.pending.push({
-      CommentPath: commentPath,
-      CommentPathStatus: commentPathStatus
-    })
     setTimeout(updateCommentPathStatus, 1000)
   })
 }
 
 const updateCommentPathStatus = () => {
   console.log('updateCommentPathStatus')
-  commentManager.value.pending.forEach((commentPathStatus: any) => {
-    getQueueCommentPathStatus(commentPathStatus.CommentPathStatus.queueId).then(
+  pendingPathsStatus.value.forEach((commentPathStatus: any) => {
+    
+    getQueueCommentPathStatus(commentPathStatus.queueId).then(
       (commentPathStatus: CommentPathStatus) => {
         console.log('commentPathStatus', commentPathStatus)
         if (commentPathStatus.message === 'done') {
-          commentManager.value.completed.push(commentPathStatus.commentPath!)
-          commentManager.value.pending = commentManager.value.pending.filter(
-            (commentPathStatus: any) => {
-              return (
-                commentPathStatus.CommentPathStatus.id !== commentPathStatus.CommentPathStatus.id
-              )
+          getCommentPathsBySubmissionId(String(post.value._id)).then(
+            (envelope: DataListEnvelope<CommentPath>) => {
+              console.log('commentPaths', envelope.data)
+              completedPaths.value = envelope.data
             }
           )
-          console.log('done', commentManager.value.completed)
         }
-        setTimeout(updateCommentPathStatus, 1000)
+        else
+          setTimeout(updateCommentPathStatus, 1000)
       }
     )
   })
@@ -105,16 +99,15 @@ const updateCommentPathStatus = () => {
       <div>
         <!-- Generate Comment Button -->
         <button @click="generateComment" class="bg-reddit-blue text-white rounded-lg px-4 py-2 m-2">
-          Generate Comment
+          Generate Comment Path
         </button>
-        <!-- Comment Path using commentManager.completed -->
         <div
           class="comments rounded-lg"
-          v-for="commentPath in commentManager.completed"
+          v-for="commentPath in completedPaths"
           :key="commentPath._id"
         >
-          <div v-for="(comment, commentIndex) in commentPath" :key="comment._id">
-            <div class="comment" :style="{ marginLeft: `${Number(commentIndex) * 20}px` }">
+          <div v-for="(comment, index) in commentPath.path" :key="comment._id">
+            <div class="comment" :style="{ marginLeft: `${Number(index) * 20}px` }">
               <h1>{{ comment.user }}</h1>
               <p>{{ comment.text }}</p>
             </div>
