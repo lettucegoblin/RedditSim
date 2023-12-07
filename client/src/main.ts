@@ -2,7 +2,7 @@
 
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'
-
+import Toast from "vue-toastification";
 import App from './App.vue'
 import router from './router'
 import './tailwind.css'
@@ -20,6 +20,6 @@ library.add(faSun, faMoon, faBell, faBars, faTimes, faSearch)
 
 const app = createApp(App)
 .use(createPinia())
-.use(router)
+.use(router).use(Toast, {})
 .component('font-awesome-icon', FontAwesomeIcon)
 .mount('#app')

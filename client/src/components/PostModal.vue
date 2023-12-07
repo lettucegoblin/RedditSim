@@ -86,7 +86,7 @@ const userCommentsTexts = ref({} as { [key: string]: string })
 
 
 const SubmitComment = (commentPath: CommentPath) => {
-  debugger
+  
   if (!session.user)
     return
   const text = userCommentsTexts.value[commentPath._id]
@@ -101,7 +101,7 @@ const SubmitComment = (commentPath: CommentPath) => {
     submissionId: post.value._id.toString(),
   } as pendingComment
   console.log('comment', comment)
-  debugger
+  
   addToEndOfCommentPath(comment.commentPathId, comment.submissionId, comment).then((envelope: DataEnvelope<CommentPath>) => {
     //console.log('commentPath', envelope.data)
     getCommentPathsBySubmissionId(String(post.value._id)).then(
@@ -122,7 +122,8 @@ const SubmitComment = (commentPath: CommentPath) => {
       <div class="rounded-lg p-6">
         <h2>{{ post.title }}</h2>
         <p>{{ post.author }}</p>
-        <p>{{ post.text }}</p>
+        <img v-if="post.image" :src="'data:image/png;base64,'+post.image"  />
+        <p v-else>{{ post.text }}</p>
       </div>
       <div>
         <!-- Generate Comment Button -->

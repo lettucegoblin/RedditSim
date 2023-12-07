@@ -9,7 +9,8 @@ router
   model
     .login(username, passcode)
     .then((user) => {
-      res.json(user);
+      const data = { data: user, isSuccessful: true };
+      res.json(data);
     })
     .catch(next);
 })
@@ -18,7 +19,8 @@ router
   model
     .register(username, passcode)
     .then((user) => {
-      res.json(user);
+      const data = { data: user, isSuccessful: true };
+      res.json(data);
     }).catch(next);
 })
 

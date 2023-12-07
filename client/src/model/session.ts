@@ -44,8 +44,8 @@ export function api(action: string, body?: unknown, method?: string, headers?: a
     .finally(() => session.loading--)
 }
 
-export function showError(error: string | { message: string }) {
-  const errMessage = typeof error === 'string' ? error : error.message
+export function showError(error: string | { error: string, isSuccessful: boolean, status:number }) {
+  const errMessage = typeof error === 'string' ? error : error.error
   console.error(errMessage)
   toast.error(errMessage)
 }
@@ -65,9 +65,12 @@ export function useLogin(){
   return {
     async login(username: string, passcode: string): Promise< User | null> {
       const response = await api("users/login", { username, passcode }, "POST");
+      if (!response.isSuccessful) showError(response.message);
 
-      session.user = response.user;
-      session.token = response.token;
+      
+      
+      session.user = response.data.user;
+      session.token = response.data.token;
 
       router.push(session.redirectUrl || "/");
       return session.user;

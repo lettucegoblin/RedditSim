@@ -1,6 +1,6 @@
 const { connect, ObjectId } = require('./mongo');
 const COLLECTION_NAME = 'submissions';
-
+const SUBMISSION_SORT = { timestamp: -1 };
 async function collection() {
   const db = await connect();
   return db.collection(COLLECTION_NAME);
@@ -41,7 +41,7 @@ async function genImage(postObj) {
 
 async function getAll(page = 1, pageSize = 30) {
   const col = await collection();
-  const items = await col.find().skip((page-1) * pageSize).limit(pageSize).toArray();
+  const items = await col.find().sort(SUBMISSION_SORT).skip((page-1) * pageSize).limit(pageSize).toArray();
   const total = await col.countDocuments(); 
   return { items, total };
 }
@@ -53,7 +53,7 @@ async function get(id) {
 
 async function getAllBySubredditId(subreddit_id, page = 1, pageSize = 30) {
   const col = await collection();
-  const subreddit = await col.find({ subreddit_id }).skip((page-1) * pageSize).limit(pageSize).toArray();
+  const subreddit = await col.find({ subreddit_id }).sort(SUBMISSION_SORT).skip((page-1) * pageSize).limit(pageSize).toArray();
   const total = await col.countDocuments({ subreddit_id });
   return { subreddit, total };
 }

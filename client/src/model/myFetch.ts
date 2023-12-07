@@ -22,7 +22,8 @@ export function rest(url: string, body?: unknown, method?: string, headers?: Hea
     else
       return response.json().then((err) => {
         console.log("err", err);
-        Promise.reject(err)
+        throw err
+        //Promise.reject(err)
       });
   }
   );
@@ -35,7 +36,7 @@ export function api(action: string, body?: unknown, method?: string, headers?: H
 
 export type DataEnvelope<T> = {
   data: T,
-  isSuccess: boolean,
+  isSuccessful: boolean,
   error?: string,
 }
 

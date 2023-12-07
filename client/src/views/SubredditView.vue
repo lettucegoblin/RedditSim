@@ -142,7 +142,7 @@ const solidifySubmission = (submission: SubmissionsItem) => {
 
 const submissionsSortedByTimestamp = computed(() => {
   return submissions.value.sort((a, b) => {
-    return  b.timestamp -  a.timestamp
+    return  b.timestamp  -a.timestamp
   })
 })
 const loadMoreButton = ref()

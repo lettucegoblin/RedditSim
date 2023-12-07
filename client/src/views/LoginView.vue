@@ -16,15 +16,21 @@ const submit = () => {
 </script>
 
 <template>
-  <div>
-    <h1>Sign In</h1>
-    <form @submit.prevent="submit">
-      <label for="username">Username</label>
-      <input id="username" v-model="username" type="text" />
-      <label for="passcode">Passcode</label>
-      <input id="passcode" v-model="passcode" type="password" />
-      <button type="submit">Sign In</button>
-    </form>
+  <div class="flex justify-center items-center h-screen">
+    <div class="w-1/3">
+      <h1 class="text-3xl font-bold mb-4">Sign In</h1>
+      <form @submit.prevent="submit">
+        <div class="mb-4">
+          <label for="username" class="block mb-2">Username</label>
+          <input autocomplete="username" id="username" v-model="username" type="text" class="w-full px-4 py-2 border rounded" />
+        </div>
+        <div class="mb-4">
+          <label for="passcode" class="block mb-2">Passcode</label>
+          <input autocomplete="password" id="passcode" v-model="passcode" type="password" class="w-full px-4 py-2 border rounded" />
+        </div>
+        <button type="submit" class="w-full bg-blue-500 text-white py-2 px-4 rounded">Sign In</button>
+      </form>
+    </div>
   </div>
 </template>
 
