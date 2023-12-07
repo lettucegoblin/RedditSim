@@ -31,9 +31,7 @@ if (props.post.pending) {
     pendingSubStatus.value = subStatus;
     probeStatus()
   });
-} else {
-  console.log('else', props.post);
-}
+} 
 
 function probeStatus() {
   if (!pendingSubStatus.value.queueId){
@@ -55,7 +53,6 @@ function probeStatus() {
         ...pendingSub.value,
         pending: false,
       } as unknown as SubmissionsItem;
-      debugger;
       emit('updatePendingStatus');
       emit('solidifySubmission', submissionToDisplay.value)
       /*getSubmission(submissionToDisplay.value.subreddit, pendingSub.value._id).then((envelope) => {

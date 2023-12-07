@@ -44,7 +44,6 @@ const completedPaths = ref([] as CommentPath[])
 
 const generateComment = () => {
   console.log('generateComment', post.value)
-  debugger
 
   const commentPath = {
     commentPath: [],

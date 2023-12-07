@@ -54,7 +54,7 @@ async function get(id) {
 async function getAllBySubredditId(subreddit_id, page = 1, pageSize = 30) {
   const col = await collection();
   const subreddit = await col.find({ subreddit_id }).skip((page-1) * pageSize).limit(pageSize).toArray();
-  const total = await col.countDocuments();
+  const total = await col.countDocuments({ subreddit_id });
   return { subreddit, total };
 }
 

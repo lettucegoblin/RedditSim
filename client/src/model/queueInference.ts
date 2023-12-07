@@ -45,7 +45,6 @@ export interface CommentPathStatus {
 */
 // queueComment
 export function queueCommentPath(comment: CommentPathPending): Promise<CommentPathStatus> {
-  debugger
   return myFetch.api('queue/addCommentPath', comment);
 }
 export function getQueueCommentPathStatus(queueId: string): Promise<CommentPathStatus> {

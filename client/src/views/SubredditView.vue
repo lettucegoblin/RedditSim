@@ -29,17 +29,25 @@ const submissions = ref<SubmissionsItem[]>([])
 const pendingSubmissions = ref<SubmissionsItem[]>([])
 const page = ref(1)
 const pageSize = ref(5)
+const totalSubmissions = ref(0)
 
 const toBeGenerated = ref(0)
 const maxToBeGenerated = 0
 
 console.log('currentSubreddit.value', currentSubreddit.value)
 function dataInit() {
+  console.log('dataInit', page.value, pageSize.value, totalSubmissions.value)
+  // initize refs
+  page.value = 1
+  pageSize.value = 5
+  totalSubmissions.value = 0
+  toBeGenerated.value = 0
   getSubredditByName(currentSubreddit.value).then((envelope) => {
     subreddit.value = envelope.data
     getSubmissions(currentSubreddit.value, page.value, pageSize.value).then((envelope) => {
       console.log('envelope', envelope)
       const { data, total } = envelope
+      totalSubmissions.value = total
       /*
       toBeGenerated.value = pageSize.value - data.length;
       if (toBeGenerated.value > maxToBeGenerated ) {
@@ -66,15 +74,22 @@ dataInit()
 
 const loadMoreSubmissions = () => {
   console.log('loadMoreSubmissions')
+  if(!isMorePages.value) return
   page.value++
   getSubmissions(currentSubreddit.value, page.value, pageSize.value).then((envelope) => {
     console.log('envelope', envelope)
     const { data, total } = envelope
+    totalSubmissions.value = total
     submissions.value.push(...data)
     if (page.value * pageSize.value >= total) lazyLoadingVisible.value = false
     else lazyLoadingVisible.value = true
   })
 }
+
+const isMorePages = computed(() => {
+  return page.value * pageSize.value < totalSubmissions.value
+})
+
 const lazyLoadingVisible = ref(false)
 
 function createPendingSubmission(
@@ -82,7 +97,7 @@ function createPendingSubmission(
   postTitle: string | undefined,
   postMedia: string | undefined
 ): SubmissionsItem {
-  debugger
+
   const pendingData = {
     timestamp: Date.now(),
     pending: true
@@ -115,7 +130,6 @@ function openSubmissionModal(submission: SubmissionsItem) {
 }
 const solidifySubmission = (submission: SubmissionsItem) => {
   console.log('updatePendingStatus', submission)
-  debugger
   // for each pendingSubmission, if pending = false, remove it from pending Submissions
   pendingSubmissions.value = pendingSubmissions.value.filter((pendingSubmission) => {
     if (pendingSubmission.pending === false) {
@@ -124,12 +138,11 @@ const solidifySubmission = (submission: SubmissionsItem) => {
     return true
   })
   submissions.value.push(submission)
-  debugger
 }
 
 const submissionsSortedByTimestamp = computed(() => {
   return submissions.value.sort((a, b) => {
-    return  a.timestamp - b.timestamp
+    return  b.timestamp -  a.timestamp
   })
 })
 const loadMoreButton = ref()
@@ -138,6 +151,8 @@ onMounted(() => {
   console.log('onMounted')
   // add event listener for scroll
   window.addEventListener('scroll', function () {
+    if (!loadMoreButton.value) return
+    if (!lazyLoadingVisible.value) return
     console.log('scroll')
     const rect = loadMoreButton.value.getBoundingClientRect();
     const offset = 200;
