@@ -1,11 +1,15 @@
 // express.js
-require('dotenv').config()
+require("dotenv").config();
 const path = require("path");
 
 const express = require("express");
 const subredditController = require("./controllers/subreddit");
 const userController = require("./controllers/users");
 const queueController = require("./controllers/queueInference");
+const {
+  parseAuthorizationToken,
+  requireUser,
+} = require("./middleware/authorization");
 const app = express();
 
 const PORT = process.env.PORT || 3000;
@@ -19,11 +23,12 @@ app
     res.header("Access-Control-Allow-Origin", "*");
     res.header("Access-Control-Allow-Methods", "*");
     res.header("Access-Control-Allow-Headers", "*");
+    if (req.method === "OPTIONS") {
+      return res.send(200);
+    }
     next();
   })
-  .use("/api/v1/me", (req, res, next) => {
-    res.json({ message: "user profile" });
-  })
+  .use(parseAuthorizationToken)
   .use("/api/v1/queue", queueController)
   .use("/api/v1/subreddits", subredditController)
   .use("/api/v1/users", userController)
@@ -33,7 +38,12 @@ app
 
 app.use((err, req, res, next) => {
   console.error(err);
-  res.status(err?.status || 500).json({ message: err?.message || err });
+  const msg = {
+    status: err.code || 500,
+    error: err.message || "Internal Server Error",
+    isSuccess: false,
+  };
+  res.status(msg.status).json(msg);
 });
 
 console.log("1: Trying to start server...");

@@ -1,23 +1,25 @@
 const express = require("express");
 const router = express.Router();
 
+const model = require("../models/users.js")
+const { requireUser } = require("../middleware/authorization");
 router
-  .use("/user/:userId/about", (req, res) => {
-    const { userId } = req.params;
-    res.json({ message: `about user ${userId}` });
-  })
-  .use("/user/:userId/comments", (req, res) => {
-    const { userId } = req.params;
-    res.json({ message: `comments of user ${userId}` });
-  })
-  .use("/user/:userId/posts", (req, res) => {
-    const { userId } = req.params;
-
-    res.json({ message: `posts of user ${userId}` });
-  })
-  .use("/user/:userId", (req, res) => {
-    const { userId } = req.params;
-    res.json({ message: `whole user ${userId}` });
-  });
+.post("/login", (req, res, next) => {
+  const { username, passcode } = req.params;
+  model
+    .login(username, passcode)
+    .then((user) => {
+      res.json(user);
+    })
+    .catch(next);
+})
+.post("/register", (req, res, next) => {
+  const { username, passcode } = req.body;
+  model
+    .register(username, passcode)
+    .then((user) => {
+      res.json(user);
+    }).catch(next);
+})
 
 module.exports = router;

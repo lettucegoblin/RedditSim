@@ -7,23 +7,29 @@ console.log("API_ROOT", API_ROOT);
  * @param method - The HTTP method to use for the API call (default is 'GET').
  * @returns A Promise that resolves to the JSON response from the API call.
  */
-export function rest(url: string, body?: unknown, method?: string) {
+export function rest(url: string, body?: unknown, method?: string, headers?: HeadersInit) {
   // fluent pattern made popular by jQuery
   return fetch(url, {
     method: method ?? (body ? "POST" : "GET"),
     headers: {
       "Content-Type": "application/json",
+      ...headers,
     },
     body: body ? JSON.stringify(body) : undefined,
-  }).then((response) =>
-    response.ok
-      ? response.json()
-      : response.json().then((err) => Promise.reject(err))
+  }).then((response) => {
+    if (response.ok)
+      return response.json()
+    else
+      return response.json().then((err) => {
+        console.log("err", err);
+        Promise.reject(err)
+      });
+  }
   );
 }
 
-export function api(action: string, body?: unknown, method?: string) {
-  return rest(`${API_ROOT}/${action}`, body, method);
+export function api(action: string, body?: unknown, method?: string, headers?: HeadersInit) {
+  return rest(`${API_ROOT}/${action}`, body, method, headers);
 }
 
 

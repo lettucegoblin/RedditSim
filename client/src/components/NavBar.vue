@@ -13,7 +13,9 @@ import {
 } from '@headlessui/vue'
 import SearchVue from '@/components/Search.vue'
 const darkMode = ref(true)
-
+import { getSession, useLogin } from '@/model/session'
+const session = getSession()
+const { login, logout } = useLogin()
 const toggleDarkMode = () => {
   darkMode.value = !darkMode.value
   if (darkMode.value) {
@@ -76,10 +78,10 @@ const navigation = [
               </button>
             </div>
             <!-- Profile dropdown -->
-            <Menu as="div" class="relative ml-3">
+            <Menu v-if="session.user"  as="div" class="relative ml-3">
               <div>
                 <MenuButton
-                  class="relative flex rounded-full bg-gray-800 text-sm focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800"
+                  class="relative flex rounded-full bg-gray-800 text-sm focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800 "
                 >
                   <span class="absolute -inset-1.5" />
                   <span class="sr-only">Open user menu</span>
@@ -99,7 +101,7 @@ const navigation = [
                 leave-to-class="transform opacity-0 scale-95"
               >
                 <MenuItems
-                  class="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none"
+                  class="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none dark:bg-reddit-primary-dark"
                 >
                   <MenuItem v-slot="{ active }">
                     <a
@@ -134,6 +136,29 @@ const navigation = [
                 </MenuItems>
               </transition>
             </Menu>
+            <div v-else>
+            <RouterLink  to="/login" class="ml-3">
+              <button
+                type="button"
+                class="relative rounded-full w-10 h-10 hover:text-gray-500 dark:hover:text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800"
+              >
+                <span class="absolute -inset-1.5" />
+                <span class="">Sign In</span>
+                <font-awesome-icon icon="sign-in-alt" class="h-6 w-6" />
+              </button>
+            </RouterLink>
+            <!--Sign Up-->
+            <RouterLink to="/signup" class="ml-3">
+              <button
+                type="button"
+                class="relative rounded-full w-10 h-10 hover:text-gray-500 dark:hover:text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800"
+              >
+                <span class="absolute -inset-1.5" />
+                <span class="">Sign Up</span>
+                <font-awesome-icon icon="user-plus" class="h-6 w-6" />
+              </button>
+            </RouterLink>
+          </div>
           </div>
         </div>
       </div>
