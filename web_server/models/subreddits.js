@@ -97,6 +97,11 @@ async function addCommentPath(submissionId, commentPath, inferencedCommentPath) 
   return await Comments.insertCommentPath(commentPath, inferencedCommentPath);
 }
 
+//addToEndOfCommentPath
+async function addToEndOfCommentPath(submissionId, commentPathId, commentText, userId, username) {
+  return await Comments.addToEndOfCommentPath(submissionId, commentPathId, commentText, userId, username);
+}
+
 async function getCommentPath(submissionId, commentPathId) {
   return await Comments.getCommentPath(submissionId, commentPathId);
 }
@@ -118,5 +123,6 @@ module.exports = {
   getSubmissionById,
   addCommentPath,
   getCommentPath,
-  getCommentPathsRoots
+  getCommentPathsRoots,
+  addToEndOfCommentPath,
 };

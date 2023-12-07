@@ -124,7 +124,7 @@ const navigation = [
                     >
                   </MenuItem>
                   <MenuItem v-slot="{ active }">
-                    <a
+                    <a @click="logout"
                       href="#"
                       :class="[
                         active ? 'bg-gray-100' : '',

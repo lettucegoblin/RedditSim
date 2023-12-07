@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import type { SubmissionsItem } from '@/model/subreddit'
-import { getCommentPathsBySubmissionId, type Comment, type CommentPath } from '@/model/subreddit'
+import type { SubmissionsItem, pendingComment } from '@/model/subreddit'
+import { addToEndOfCommentPath, getCommentPathsBySubmissionId, type Comment, type CommentPath } from '@/model/subreddit'
 import { onMounted, ref } from 'vue'
 import {
   type CommentPathPending,
@@ -8,8 +8,10 @@ import {
   queueCommentPath,
   getQueueCommentPathStatus
 } from '@/model/queueInference'
-import type { DataListEnvelope } from '@/model/myFetch'
+import type { DataEnvelope, DataListEnvelope } from '@/model/myFetch'
+import { getSession } from '../model/session';
 
+const session = getSession()
 const props = defineProps({
   post: {
     type: Object as () => SubmissionsItem,
@@ -80,6 +82,37 @@ const updateCommentPathStatus = () => {
     )
   })
 }
+const userCommentsTexts = ref({} as { [key: string]: string })
+
+
+const SubmitComment = (commentPath: CommentPath) => {
+  debugger
+  if (!session.user)
+    return
+  const text = userCommentsTexts.value[commentPath._id]
+  userCommentsTexts.value[commentPath._id] = ''
+  console.log('SubmitComment', commentPath, text)
+  const comment = {
+    user: session.user!.username,
+    userId: session.user!._id.toString(),
+    text: text,
+    formatted: `${session.user.username} - ${text}`,
+    commentPathId: commentPath._id,
+    submissionId: post.value._id.toString(),
+  } as pendingComment
+  console.log('comment', comment)
+  debugger
+  addToEndOfCommentPath(comment.commentPathId, comment.submissionId, comment).then((envelope: DataEnvelope<CommentPath>) => {
+    //console.log('commentPath', envelope.data)
+    getCommentPathsBySubmissionId(String(post.value._id)).then(
+      (envelope: DataListEnvelope<CommentPath>) => {
+        console.log('commentPaths', envelope.data)
+        completedPaths.value = envelope.data
+      }
+    )
+  })
+
+}
 </script>
 
 <template>
@@ -94,8 +127,13 @@ const updateCommentPathStatus = () => {
       <div>
         <!-- Generate Comment Button -->
         <button @click="generateComment" class="bg-reddit-blue text-white rounded-lg px-4 py-2 m-2">
-          Generate Comment Path
+          Randomly Generate Comment Path
         </button>
+        <!-- write root comment -->
+        <div v-if="session.user" class="rounded-lg p-6">
+          <h2>Write Root Comment</h2>
+          <input type="text" class="border-2 border-gray-300 p-1 rounded-lg w-full" />
+        </div>
         <div class="comments rounded-lg" v-for="commentPath in completedPaths" :key="commentPath._id">
           <div v-for="(comment, index) in commentPath.commentPath" :key="comment._id">
             <div class="comment" :style="{ marginLeft: `${Number(index) * 20}px` }">
@@ -103,12 +141,20 @@ const updateCommentPathStatus = () => {
               <p>{{ comment.text }}</p>
             </div>
           </div>
+          <!--write comment-->
+          <div v-if="session.user" class="rounded-lg p-6"
+            :style="{ marginLeft: `${Number(commentPath.commentPath.length) * 20}px` }">
+            <h2>Write Comment</h2>
+            <input @keyup.enter="SubmitComment(commentPath)" v-model="userCommentsTexts[commentPath._id]" type="text"
+              class="border-2 border-gray-300 p-1 rounded-lg w-2/6" />
+          </div>
         </div>
         <!-- pendingPathsStatus -->
         <div v-for="commentPathStatus in pendingPathsStatus" :key="commentPathStatus.queueId">
           <div class="flex align-middle justify-center mb-3 mt-5">
-            <h2>Generating comment path of {{ commentPathStatus.numberOfComments }} comments... queue:{{ commentPathStatus.queueIndex }}/{{
-              commentPathStatus.queueLength }}</h2>
+            <h2>Generating comment path of {{ commentPathStatus.numberOfComments }} comments... queue:{{
+              commentPathStatus.queueIndex }}/{{
+    commentPathStatus.queueLength }}</h2>
             <div class="grayscale dot-bricks ml-5 "></div>
           </div>
         </div>

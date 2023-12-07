@@ -5,7 +5,7 @@ const model = require("../models/users.js")
 const { requireUser } = require("../middleware/authorization");
 router
 .post("/login", (req, res, next) => {
-  const { username, passcode } = req.params;
+  const { username, passcode } = req.body;
   model
     .login(username, passcode)
     .then((user) => {

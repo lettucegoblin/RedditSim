@@ -2,7 +2,7 @@ import * as myFetch from './myFetch';
 import type { DataEnvelope, DataListEnvelope } from './myFetch';
 
 export interface Subreddit {
-  _id: number;
+  _id: string;
   display_name: string;
   path_name: string;
   path: string;
@@ -14,6 +14,14 @@ export interface Subreddit {
   moderators: { id: number; name: string }[];
 };
 
+export interface pendingComment {
+  formatted: string;
+  submissionId: string;
+  commentPathId: string;
+  text: string;
+  user: string;
+  userId: string;
+}
 
 export interface Comment {
   _id: string;
@@ -30,7 +38,7 @@ export interface CommentPath {
 }
 
 export interface SubmissionsItem {
-  _id: number
+  _id: string
   title: string
   media: string
   author: string
@@ -65,4 +73,9 @@ export function getSubmission(subredditName: string, submissionId: string): Prom
 
 export function getCommentPathsBySubmissionId(submissionId: string): Promise<DataListEnvelope<CommentPath>> {
   return myFetch.api(`subreddits/comments/list/${submissionId}`);
+}
+
+//addToEndOfCommentPath
+export function addToEndOfCommentPath(commentPathId: string, submissionId: string, comment: pendingComment): Promise<DataEnvelope<CommentPath>> {
+  return myFetch.api(`subreddits/comments/${submissionId}/${commentPathId}`, comment, 'POST');
 }

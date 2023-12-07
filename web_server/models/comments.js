@@ -14,6 +14,7 @@ async function collection(COLLECTION_NAME) {
     userId: ObjectId, // only if user is not a bot
     username: String,
     text: String,
+  }
 
   commentPaths = {
     _id: ObjectId,
@@ -72,6 +73,27 @@ async function getCommentPath(submissionId, commentPathId) {
   return commentPathIds;
 }
 
+async function addToEndOfCommentPath(submissionId, commentPathId, commentText, userId, username) {
+  const col = await collection("commentPaths");
+  // change submissionId to ObjectId
+  if (typeof submissionId === "string") submissionId = new ObjectId(submissionId);
+  if (typeof commentPathId === "string") commentPathId = new ObjectId(commentPathId);
+
+  const comment = {
+    _id: new ObjectId(),
+    submissionId,
+    userId,
+    user: username,
+    text: commentText,
+  };
+  insertComment(comment);
+  
+
+  const commentPath = await col.findOne({ _id: commentPathId, submissionId });
+  commentPath.path.push(comment._id);
+  const filter = { _id: commentPath._id };
+  return await col.updateOne(filter, { $set: commentPath }, { upsert: true });
+}
 
 
 async function insertCommentPath(commentPathObj, inferencedCommentPath) {
@@ -118,4 +140,5 @@ module.exports = {
   getCommentPath,
   getCommentPathIds,
   getCommentPathsRoots,
+  addToEndOfCommentPath,
 };

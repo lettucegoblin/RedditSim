@@ -13,7 +13,7 @@ async function collection() {
 
 async function login(username, passcode) {
   const col = await collection();
-  let user = col.findOne({ username, passcode });
+  let user = await col.findOne({ username, passcode });
 
   if (!user) {
     throw new Error("User not found");
@@ -53,6 +53,18 @@ function generateJWT(user) {
   })
 }
 
+function verifyJWT(token) {
+  return new Promise((resolve, reject) => {
+    jwt.verify(token, JWT_SECRET, (err, user) => {
+      if(err) {
+        reject(err);
+      } else {
+        resolve(user);
+      }
+    });
+  })
+}
+
 // get user
 async function get(userId) {
   const col = await collection();
@@ -71,4 +83,6 @@ module.exports = {
   add,
   login,
   register,
+  verifyJWT,
+  generateJWT
 };

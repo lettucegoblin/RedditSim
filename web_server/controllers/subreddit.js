@@ -106,6 +106,15 @@ router
     })
     .catch(next);
   })
+  .post("/comments/:submissionid/:commentPathId", (req, res, next) => {
+    const {  submissionid, commentPathId } = req.params;
+    const { text, userId, user } = req.body; // user is username
+    model.addToEndOfCommentPath(submissionid, commentPathId, text, userId, user).then((result) => {
+      const data = { data: result, isSuccessful: true };
+      res.json(data);
+    })
+    .catch(next);
+  })
   .post("/:subreddit/submissions/create", (req, res, next) => {
     const { subreddit } = req.params;
     model

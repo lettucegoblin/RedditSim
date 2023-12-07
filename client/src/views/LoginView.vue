@@ -10,7 +10,7 @@ const username = ref('');
 const passcode = ref('');
 const { login, logout } = useLogin();
 
-const submit = async () => {
+const submit = () => {
   login(username.value, passcode.value)
 }
 </script>
@@ -23,7 +23,7 @@ const submit = async () => {
       <input id="username" v-model="username" type="text" />
       <label for="passcode">Passcode</label>
       <input id="passcode" v-model="passcode" type="password" />
-      <button @click="submit" type="submit">Sign In</button>
+      <button type="submit">Sign In</button>
     </form>
   </div>
 </template>

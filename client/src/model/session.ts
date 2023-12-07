@@ -20,7 +20,7 @@ const session = reactive({
 })
 
 export interface User {
-  _id: number
+  _id: string
   username: string
   role: string
 }
