@@ -44,9 +44,11 @@ const completedPaths = ref([] as CommentPath[])
 
 const generateComment = () => {
   console.log('generateComment', post.value)
+  debugger
+
   const commentPath = {
     commentPath: [],
-    postObj: post.value,
+    postObj: { ...post.value, image : undefined},
     numberOfComments: Math.floor(Math.random() * 4) + 1 // 1-4
     //nextUser: 'lettuce'
   } as CommentPathPending

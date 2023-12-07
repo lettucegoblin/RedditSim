@@ -120,8 +120,6 @@ def generate_comments():
 
     # sanitize next_user, enforce that it is a string and not empty
     next_user = next_user if next_user else ''
-    if not isinstance(next_user, str) or not next_user or len(next_user.strip()) == 0:
-        return jsonify({'error': 'nextUser does not have the correct format'})
     if not model.is_loaded():
         model.load_model()
     comments = model.generate_comments(postObj, commentPath, next_user, numberOfComments)

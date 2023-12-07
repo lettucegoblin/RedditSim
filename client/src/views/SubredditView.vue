@@ -3,121 +3,152 @@ import { type SubmissionsItem, type Subreddit } from '@/model/subreddit'
 import SubredditInfoBar from '@/components/SubredditInfoBar.vue'
 import { computed, defineAsyncComponent, ref, type PropType, onMounted, watch } from 'vue'
 import { getSubmissions, getSubredditByName } from '@/model/subreddit'
-import { useRoute } from 'vue-router';
-import PostModal from '@/components/PostModal.vue';
-import { debug } from 'console';
-const route = useRoute();
+import { useRoute } from 'vue-router'
+import PostModal from '@/components/PostModal.vue'
+const route = useRoute()
 const PostListItem = defineAsyncComponent(() => import('../components/PostListItem.vue'))
 
 watch(
   () => route.params.subreddit,
-  async newSubreddit => {
-    submissions.value = [];
-    toBeGenerated.value = 0;
-    currentSubreddit.value = makeString(newSubreddit);
-    subreddit.value = undefined;
-    console.log('currentSubreddit', currentSubreddit.value);
-    dataInit();
+  async (newSubreddit) => {
+    submissions.value = []
+    toBeGenerated.value = 0
+    currentSubreddit.value = makeString(newSubreddit)
+    subreddit.value = undefined
+    console.log('currentSubreddit', currentSubreddit.value)
+    dataInit()
   }
 )
 const makeString = (str: string | string[]) =>
-  Array.isArray(str) ? str[0].toString() : str ? str.toString() : "all";
+  Array.isArray(str) ? str[0].toString() : str ? str.toString() : 'all'
 
+const currentSubreddit = ref<string>(makeString(route.params.subreddit))
 
-const currentSubreddit = ref<string>(makeString(route.params.subreddit));
+const subreddit = ref<Subreddit>()
+const submissions = ref<SubmissionsItem[]>([])
+const pendingSubmissions = ref<SubmissionsItem[]>([])
+const page = ref(1)
+const pageSize = ref(5)
 
-const subreddit = ref<Subreddit>();
-const submissions = ref<SubmissionsItem[]>([]);
-const pendingSubmissions = ref<SubmissionsItem[]>([]);
-const page = ref(1);
-const pageSize = ref(400);
+const toBeGenerated = ref(0)
+const maxToBeGenerated = 0
 
-const toBeGenerated = ref(0);
-const maxToBeGenerated = 0;
-
-console.log('currentSubreddit.value', currentSubreddit.value);
+console.log('currentSubreddit.value', currentSubreddit.value)
 function dataInit() {
-
   getSubredditByName(currentSubreddit.value).then((envelope) => {
-    subreddit.value = envelope.data;
+    subreddit.value = envelope.data
     getSubmissions(currentSubreddit.value, page.value, pageSize.value).then((envelope) => {
-      console.log("envelope", envelope);
-      const { data, total } = envelope;
+      console.log('envelope', envelope)
+      const { data, total } = envelope
       /*
       toBeGenerated.value = pageSize.value - data.length;
       if (toBeGenerated.value > maxToBeGenerated ) {
         toBeGenerated.value = maxToBeGenerated;
       }*/
-      if (data.length <= 2)
-        toBeGenerated.value = 2 - data.length;
+      if (data.length <= 2) toBeGenerated.value = 2 - data.length
       // add pending items to data
-      const pendingDataArr = [];
+      const pendingDataArr = []
       for (let i = 0; i < toBeGenerated.value; i++) {
-        const pendingData = createPendingSubmission(currentSubreddit.value, undefined, undefined);
-        pendingDataArr.push(pendingData);
+        const pendingData = createPendingSubmission(currentSubreddit.value, undefined, undefined)
+        pendingDataArr.push(pendingData)
       }
-      pendingSubmissions.value = pendingDataArr;
+      pendingSubmissions.value = pendingDataArr
 
-      console.log("toBeGenerated", toBeGenerated.value)
+      console.log('toBeGenerated', toBeGenerated.value)
       submissions.value = data
+      if (page.value * pageSize.value >= total) lazyLoadingVisible.value = false
+      else lazyLoadingVisible.value = true
       //submissions.value = [...pendingDataArr, data].flat();
-    });
-  });
-
-
+    })
+  })
 }
-dataInit();
+dataInit()
 
-function createPendingSubmission(subreddit: string, postTitle: string | undefined, postMedia:string | undefined): SubmissionsItem {
+const loadMoreSubmissions = () => {
+  console.log('loadMoreSubmissions')
+  page.value++
+  getSubmissions(currentSubreddit.value, page.value, pageSize.value).then((envelope) => {
+    console.log('envelope', envelope)
+    const { data, total } = envelope
+    submissions.value.push(...data)
+    if (page.value * pageSize.value >= total) lazyLoadingVisible.value = false
+    else lazyLoadingVisible.value = true
+  })
+}
+const lazyLoadingVisible = ref(false)
+
+function createPendingSubmission(
+  subreddit: string,
+  postTitle: string | undefined,
+  postMedia: string | undefined
+): SubmissionsItem {
   debugger
   const pendingData = {
     timestamp: Date.now(),
-    pending: true,
-  } as SubmissionsItem;
-  if (subreddit)
-    pendingData['subreddit'] = subreddit;
-  if (postTitle && postTitle.length > 0)
-    pendingData['title'] = postTitle;
-  if (postMedia)  
-    pendingData['media'] = postMedia;
-  return pendingData;
+    pending: true
+  } as SubmissionsItem
+  if (subreddit) pendingData['subreddit'] = subreddit
+  if (postTitle && postTitle.length > 0) pendingData['title'] = postTitle
+  if (postMedia) pendingData['media'] = postMedia
+  return pendingData
 }
 
 function createAndAddPendingSubmission(subreddit: string) {
-  const pendingData = createPendingSubmission(subreddit, userInputSubmissionTitle.value, selectedMedia.value);
-  pendingSubmissions.value.push(pendingData);
+  const pendingData = createPendingSubmission(
+    subreddit,
+    userInputSubmissionTitle.value,
+    selectedMedia.value
+  )
+  pendingSubmissions.value.push(pendingData)
 }
 
-const submissionModalVisible = ref(false);
-const submissionOptionsVisible = ref(false);
-const submissionModal = ref({} as SubmissionsItem);
-const selectedMedia = ref('text');
-const userInputSubmissionTitle = ref('');
+const submissionModalVisible = ref(false)
+const submissionOptionsVisible = ref(false)
+const submissionModal = ref({} as SubmissionsItem)
+const selectedMedia = ref('text')
+const userInputSubmissionTitle = ref('')
 
 function openSubmissionModal(submission: SubmissionsItem) {
-  console.log('openSubmissionModal', JSON.stringify(submission));
-  submissionModal.value = submission;
-  submissionModalVisible.value = true;
+  console.log('openSubmissionModal', JSON.stringify(submission))
+  submissionModal.value = submission
+  submissionModalVisible.value = true
 }
 const solidifySubmission = (submission: SubmissionsItem) => {
-  console.log('updatePendingStatus', submission);
+  console.log('updatePendingStatus', submission)
   debugger
   // for each pendingSubmission, if pending = false, remove it from pending Submissions
   pendingSubmissions.value = pendingSubmissions.value.filter((pendingSubmission) => {
     if (pendingSubmission.pending === false) {
-      return false;
+      return false
     }
-    return true;
-  });
-  submissions.value.push(submission);
+    return true
+  })
+  submissions.value.push(submission)
   debugger
 }
 
 const submissionsSortedByTimestamp = computed(() => {
   return submissions.value.sort((a, b) => {
-    return b.timestamp - a.timestamp;
-  });
-});
+    return  a.timestamp - b.timestamp
+  })
+})
+const loadMoreButton = ref()
+
+onMounted(() => {
+  console.log('onMounted')
+  // add event listener for scroll
+  window.addEventListener('scroll', function () {
+    console.log('scroll')
+    const rect = loadMoreButton.value.getBoundingClientRect();
+    const offset = 200;
+    const isVisible = rect.top- 400 <= (window.innerHeight || document.documentElement.clientHeight);
+    if (isVisible && lazyLoadingVisible.value) {
+      console.log('isVisible')
+      lazyLoadingVisible.value = false
+      loadMoreSubmissions()
+    }
+  })
+})
 
 </script>
 
@@ -141,7 +172,7 @@ const submissionsSortedByTimestamp = computed(() => {
         <!--title input, media radio-->
         <div class="flex flex-col">
           <label for="title">Title</label>
-          <input type="text" id="title" name="title"  v-model="userInputSubmissionTitle"/>
+          <input type="text" id="title" name="title" v-model="userInputSubmissionTitle" />
           <!--media options: text, article, image, video-->
           <label for="media">Media</label>
           <div class="flex flex-row">
@@ -157,17 +188,24 @@ const submissionsSortedByTimestamp = computed(() => {
         </div>
       </div>
       <div v-for="submission in pendingSubmissions" :key="submission.timestamp" class="col-span-1">
-        <PostListItem :post="submission" @openSubmissionModal="openSubmissionModal" @updatePendingStatus="submission.pending=false" @solidifySubmission="solidifySubmission" />
+        <PostListItem :post="submission" @openSubmissionModal="openSubmissionModal"
+          @updatePendingStatus="submission.pending = false" @solidifySubmission="solidifySubmission" />
       </div>
 
       <div v-for="submission in submissionsSortedByTimestamp" :key="submission._id" class="col-span-1">
-        <PostListItem :post="submission" @openSubmissionModal="openSubmissionModal" @updatePendingStatus="submission.pending=false" />
+        <PostListItem :post="submission" @openSubmissionModal="openSubmissionModal"
+          @updatePendingStatus="submission.pending = false" />
       </div>
-
+      <div v-if="lazyLoadingVisible" class="flex justify-center">
+        <button @click="loadMoreSubmissions" ref="loadMoreButton"
+          class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-b-2xl dark:bg-gray-900">
+          Load More
+        </button>
+      </div>
     </div>
     <SubredditInfoBar v-if="subreddit" :subreddit="subreddit" class="hidden md:block w-1/5" />
   </div>
   <div v-else>Loading...{{ currentSubreddit }}</div>
 </template>
 
-<style scoped></style> 
+<style scoped></style>
