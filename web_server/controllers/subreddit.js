@@ -2,6 +2,7 @@ const express = require("express");
 const model = require("../models/subreddits");
 const path = require("path");
 const router = express.Router();
+const { requireUser } = require('../middleware/authorization');
 
 // between 3 and 21 characters, alphanumeric, first character must be alphabetic
 function valid_subreddit_name(name) {
@@ -106,7 +107,7 @@ router
     })
     .catch(next);
   })
-  .post("/comments/:submissionid/:commentPathId", (req, res, next) => {
+  .post("/comments/:submissionid/:commentPathId", requireUser(), (req, res, next) => {
     const {  submissionid, commentPathId } = req.params;
     const { text, userId, user } = req.body; // user is username
     model.addToEndOfCommentPath(submissionid, commentPathId, text, userId, user).then((result) => {

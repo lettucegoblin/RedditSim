@@ -9,7 +9,7 @@
       "type": "node",
       "request": "launch",
       "name": "Launch Program",
-      "runtimeExecutable": "/home/lettuce/.nvm/versions/node/v21.1.0/bin/node",
+   
       "skipFiles": [
         "<node_internals>/**"
       ],

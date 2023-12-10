@@ -1,27 +1,34 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en" class="dark">
   <head>
-    <meta charset="UTF-8">
-    <link rel="icon" href="/favicon.ico">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/three-dots/0.3.2/three-dots.min.css" integrity="sha512-+eTSgc6ThafkxKlVr4a/XE1HdNz3zNWLdq5vP8H7ac9MuW/LMQBXI3O3ueyyf33yeCn+KhkVP1wBYYIb0OZh3g==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <meta charset="UTF-8" />
+    <link rel="icon" href="/favicon.ico" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/three-dots/0.3.2/three-dots.min.css"
+      integrity="sha512-+eTSgc6ThafkxKlVr4a/XE1HdNz3zNWLdq5vP8H7ac9MuW/LMQBXI3O3ueyyf33yeCn+KhkVP1wBYYIb0OZh3g=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
     <title>Reddit Sim</title>
     <style>
-      .Vue-Toastification__container{
-        position: absolute;
+      .Vue-Toastification__container {
+        position: fixed;
         top: 0;
         right: 0;
         border-radius: 1em;
         margin: 2em;
         padding: 1em;
-          }
-      .Vue-Toastification__container.bottom-right{
+        z-index: 9999;
+      }
+      .Vue-Toastification__container.bottom-right {
         top: auto;
         bottom: 0;
         right: 0;
         pointer-events: none;
       }
-      .Vue-Toastification__container .Vue-Toastification__toast{
+      .Vue-Toastification__container .Vue-Toastification__toast {
         margin: 0.5em 0;
         padding: 0.5em 1em;
         border-radius: 0.5em;
@@ -32,16 +39,15 @@
         display: flex;
         align-items: center;
         justify-content: space-between;
-        box-shadow: 0 0 1em rgba(0,0,0,0.5);
+        box-shadow: 0 0 1em rgba(0, 0, 0, 0.5);
         transition: all 0.5s ease;
-        
       }
-      .Vue-Toastification__toast-body{
+      .Vue-Toastification__toast-body {
         display: flex;
         align-items: center;
-        margin:10px
+        margin: 10px;
       }
-      .Vue-Toastification__container button{
+      .Vue-Toastification__container button {
         background: none;
         border: none;
         color: inherit;
@@ -51,20 +57,19 @@
         padding: 0.5em;
         border-radius: 0.5em;
         transition: all 0.5s ease;
-
       }
-      .Vue-Toastification__toast--info{
-            background-color: #2196f3;
-          }
-      .Vue-Toastification__toast--default{
-            background-color: #607d8b;
-          }
-      .Vue-Toastification__toast--success{
-            background-color: #4caf50;
-          }
-      .Vue-Toastification__toast--error{
-            background-color: #f44336;
-          }
+      .Vue-Toastification__toast--info {
+        background-color: #2196f3;
+      }
+      .Vue-Toastification__toast--default {
+        background-color: #607d8b;
+      }
+      .Vue-Toastification__toast--success {
+        background-color: #4caf50;
+      }
+      .Vue-Toastification__toast--error {
+        background-color: #f44336;
+      }
     </style>
   </head>
   <body>

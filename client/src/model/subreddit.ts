@@ -1,4 +1,5 @@
 import * as myFetch from './myFetch';
+import { api } from './session';
 import type { DataEnvelope, DataListEnvelope } from './myFetch';
 
 export interface Subreddit {
@@ -77,5 +78,5 @@ export function getCommentPathsBySubmissionId(submissionId: string): Promise<Dat
 
 //addToEndOfCommentPath
 export function addToEndOfCommentPath(commentPathId: string, submissionId: string, comment: pendingComment): Promise<DataEnvelope<CommentPath>> {
-  return myFetch.api(`subreddits/comments/${submissionId}/${commentPathId}`, comment, 'POST');
+  return api(`subreddits/comments/${submissionId}/${commentPathId}`, comment, 'POST');
 }
