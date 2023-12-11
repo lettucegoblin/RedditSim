@@ -77,7 +77,8 @@ async function addToEndOfCommentPath(submissionId, commentPathId, commentText, u
   const col = await collection("commentPaths");
   // change submissionId to ObjectId
   if (typeof submissionId === "string") submissionId = new ObjectId(submissionId);
-  if (typeof commentPathId === "string") commentPathId = new ObjectId(commentPathId);
+  if (typeof commentPathId === "string") 
+    commentPathId = new ObjectId(commentPathId);
 
   const comment = {
     _id: new ObjectId(),

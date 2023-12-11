@@ -2,7 +2,7 @@ const express = require("express");
 const model = require("../models/subreddits");
 const path = require("path");
 const router = express.Router();
-const { requireUser } = require('../middleware/authorization');
+const { requireUser } = require("../middleware/authorization");
 
 // between 3 and 21 characters, alphanumeric, first character must be alphabetic
 function valid_subreddit_name(name) {
@@ -90,32 +90,58 @@ router
   .get("/comments/:commentId", (req, res, next) => {
     const { subreddit, commentId } = req.params;
     res.json({ message: `comment ${commentId} of subreddit ${subreddit}` });
-  })   //comments/list/656c0329eb07c3872bd6d9cf
+  }) //comments/list/656c0329eb07c3872bd6d9cf
   .get("/comments/list/:submissionid", (req, res, next) => {
-    const {  submissionid } = req.params;
-    model.getCommentPathsRoots(submissionid).then((commentPaths) => {
-      const data = { data: commentPaths, isSuccessful: true };
-      res.json(data);
-    })
-    .catch(next);
+    const { submissionid } = req.params;
+    model
+      .getCommentPathsRoots(submissionid)
+      .then((commentPaths) => {
+        const data = { data: commentPaths, isSuccessful: true };
+        res.json(data);
+      })
+      .catch(next);
   })
   .get("/comments/:submissionid/:commentPathId", (req, res, next) => {
-    const {  submissionid, commentPathId } = req.params;
-    model.getCommentPath(submissionid, commentPathId).then((commentPaths) => {
-      const data = { data: commentPaths, isSuccessful: true };
-      res.json(data);
-    })
-    .catch(next);
+    const { submissionid, commentPathId } = req.params;
+    model
+      .getCommentPath(submissionid, commentPathId)
+      .then((commentPaths) => {
+        const data = { data: commentPaths, isSuccessful: true };
+        res.json(data);
+      })
+      .catch(next);
   })
-  .post("/comments/:submissionid/:commentPathId", requireUser(), (req, res, next) => {
-    const {  submissionid, commentPathId } = req.params;
-    const { text, userId, user } = req.body; // user is username
-    model.addToEndOfCommentPath(submissionid, commentPathId, text, userId, user).then((result) => {
-      const data = { data: result, isSuccessful: true };
-      res.json(data);
-    })
-    .catch(next);
-  })
+  .post(
+    "/comments/:submissionid/:commentPathId",
+    requireUser(),
+    (req, res, next) => {
+      const { submissionid, commentPathId } = req.params;
+      const { text, userId, user } = req.body; // user is username
+      if (commentPathId == "root") {
+        model
+          .addCommentPath(submissionid, {}, [req.body] )
+          .then((result) => {
+            const data = { data: result, isSuccessful: true };
+            res.json(data);
+          })
+          .catch(next);
+      } else {
+        model
+          .addToEndOfCommentPath(
+            submissionid,
+            commentPathId,
+            text,
+            userId,
+            user
+          )
+          .then((result) => {
+            const data = { data: result, isSuccessful: true };
+            res.json(data);
+          })
+          .catch(next);
+      }
+    }
+  )
   .post("/:subreddit/submissions/create", (req, res, next) => {
     const { subreddit } = req.params;
     model

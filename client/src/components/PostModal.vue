@@ -84,6 +84,32 @@ const updateCommentPathStatus = () => {
 }
 const userCommentsTexts = ref({} as { [key: string]: string })
 
+const SubmitRootComment = () => {
+  if (!session.user)
+    return
+  const text = userCommentsTexts.value['root']
+  userCommentsTexts.value['root'] = ''
+  console.log('SubmitRootComment', text)
+  const comment = {
+    user: session.user!.username,
+    userId: session.user!._id.toString(),
+    text: text,
+    formatted: `${session.user.username} - ${text}`,
+    commentPathId: 'root',
+    submissionId: post.value._id.toString(),
+  } as pendingComment
+  console.log('comment', comment)
+  
+  addToEndOfCommentPath(comment.commentPathId, comment.submissionId, comment).then((envelope: DataEnvelope<CommentPath>) => {
+    console.log('commentPath', envelope.data)
+    getCommentPathsBySubmissionId(String(post.value._id)).then(
+      (envelope: DataListEnvelope<CommentPath>) => {
+        console.log('commentPaths', envelope.data)
+        completedPaths.value = envelope.data
+      }
+    )
+  })
+}
 
 const SubmitComment = (commentPath: CommentPath) => {
   
@@ -133,7 +159,10 @@ const SubmitComment = (commentPath: CommentPath) => {
         <!-- write root comment -->
         <div v-if="session.user" class="rounded-lg p-6">
           <h2>Write Root Comment</h2>
-          <input type="text" class="border-2 border-gray-300 p-1 rounded-lg w-full" />
+          <input @keyup.enter="SubmitRootComment()" v-model="userCommentsTexts['root']" type="text" class="border-2 border-gray-300 p-1 rounded-lg w-full" />
+        </div>
+        <div v-else class="rounded-lg p-6">
+          <h2>Log in to write a comment</h2>
         </div>
         <div class="comments rounded-lg" v-for="commentPath in completedPaths" :key="commentPath._id">
           <div v-for="(comment, index) in commentPath.commentPath" :key="comment._id">
@@ -148,6 +177,10 @@ const SubmitComment = (commentPath: CommentPath) => {
             <h2>Write Comment</h2>
             <input @keyup.enter="SubmitComment(commentPath)" v-model="userCommentsTexts[commentPath._id]" type="text"
               class="border-2 border-gray-300 p-1 rounded-lg w-2/6" />
+          </div>
+          <div v-else class="rounded-lg p-6"
+            :style="{ marginLeft: `${Number(commentPath.commentPath.length) * 20}px` }">
+            <h2>Log in to write a comment</h2>
           </div>
         </div>
         <!-- pendingPathsStatus -->
