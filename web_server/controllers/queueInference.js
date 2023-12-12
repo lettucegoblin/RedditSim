@@ -16,7 +16,7 @@ lastCheckTimestamp = Date.now();
 setInterval(() => {
   if (queue.length > 0 && Date.now() - lastCheckTimestamp > 5000) {
     lastCheckTimestamp = Date.now();
-    console.log("queue", queue);
+    console.log("queue", queue.length);
     let id = queue[0];
     if (toDo[id].spot_id) {
       if (toDo[id].status === "done") {
@@ -64,6 +64,10 @@ setInterval(() => {
               });
             
           }
+        }).catch((err) => {
+          console.log("inference_comments", err);
+          toDo[id].error = err;
+          toDo[id].status = "error";
         });
       } else {
         inference_submission(spot_id, toDo[id]).then((res) => {
@@ -89,11 +93,20 @@ setInterval(() => {
               })
               .catch((err) => {
                 console.log("addSubmission", err);
-                toDo[id].status = "done";
+                toDo[id].error = err;
+                toDo[id].status = "error";
               });
           }
+        }).catch((err) => {
+          console.log("inference_submission", err);
+          toDo[id].error = err;
+          toDo[id].status = "error";
         });
       }
+    }).catch((err) => {
+      console.log("reserve_spot", err);
+      toDo[id].error = err;
+      toDo[id].status = "error";
     });
   }
 }, 5000);
@@ -144,6 +157,10 @@ router
       return;
     } else if (submission.status === "done") {
       res.json({ message: "done", postObj: submission.postObj });
+      return;
+    }
+    else if (submission.status === "error") {
+      res.json({ message: "error", error: submission.error });
       return;
     }
     res.json({ message: "error" });

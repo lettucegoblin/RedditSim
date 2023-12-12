@@ -30,6 +30,7 @@ async function inference_submission(spot_id, postObj = {}){
       spot_id
     })
   });
+  console.log(response)
   json = await response.json();
   console.log("inference_submission response", json) 
   // return the response
