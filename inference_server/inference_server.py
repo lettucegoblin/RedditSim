@@ -79,17 +79,20 @@ def generate_image():
     global TESTING
     if not TESTING:
         return jsonify({'error': 'not allowed to generate image'})
-    postObj = request.json.get('postObj')
-    aspect_ratios = [
-        1/1, # square
-        4/3, 3/2, 16/9, # horizontal
-        3/4, 2/3, 9/16 # vertical
-    ]
-    aspect_ratio = random.choice(aspect_ratios)
-    width, height = calculate_dimensions(aspect_ratio, 512, 512)
-    print (width, height)
-    image = model.generate_image(postObj, width, height)
-    return jsonify({'image': image})
+    try:
+        postObj = request.json.get('postObj')
+        aspect_ratios = [
+            1/1, # square
+            4/3, 3/2, 16/9, # horizontal
+            3/4, 2/3, 9/16 # vertical
+        ]
+        aspect_ratio = random.choice(aspect_ratios)
+        width, height = calculate_dimensions(aspect_ratio, 512, 512)
+        print (width, height)
+        image = model.generate_image(postObj, width, height)
+        return jsonify({'image': image})
+    except ConnectionRefusedError as e:
+        return jsonify({'error': "Stable diffusion server is not running."})
 
 required_comment_keys = ['user', 'text']
 @app.route('/generate_comments', methods=['POST']) # curl -X POST -H "Content-Type: application/json" -d '{"postObj":{"author":"pikachu_daddy","media":"text","postPrompt":"You are a Reddit post generator.\nUser: \nSubreddit: /r/AskReddit \nAuthor: pikachu_daddy \nMedia: text \nTitle: 1962 Volkswagen Beetle \nWrite the Reddit post.\nAssistant:","subreddit":"/r/AskReddit","text":" \nMy dad bought this car in 1970 for $500 and he still has it today at age 84. He\u2019s had to replace some parts (like the engine) but everything else is original including the paint job! I think my mom wants him to sell it once he can no longer drive, but I hope not because it would be like selling family history.\nEdit: Thank you all so much for your kind words! My parents have been married for over 54 years now and they met back when he was working on his first VW Bug. They both love cars and my dad even worked as an auto mechanic before going into teaching. It\u2019s really amazing that he\u2019s kept this one for so long!","title":"1962 Volkswagen Beetle"}}' http://localhost:5000/generate_comments

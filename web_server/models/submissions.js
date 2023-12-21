@@ -34,7 +34,7 @@ async function genImage(postObj) {
     })
   });
   json = await response.json();
-  console.log("inference_submission response", json) 
+  console.log("inference_submission") 
   // return the response
   return json['image']
 }

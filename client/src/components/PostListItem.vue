@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { getSubmission, type SubmissionsItem } from '@/model/subreddit';
 import { computed, defineProps, ref } from 'vue'
+import { showError } from '@/model/session';
 import { type SubmissionsItemPending, queueSubmission, getSubmissionStatus, type SubmissionsItemStatus } from '../model/queueInference';
 
 const props = defineProps({
@@ -35,10 +36,16 @@ if (props.post.pending) {
 
 function probeStatus() {
   if (!pendingSubStatus.value.queueId){
-    throw new Error('No queueId');
+    //throw new Error('No queueId');
+    showError('No queueId');
     return
   }
   getSubmissionStatus(pendingSubStatus.value.queueId).then((subStatus: SubmissionsItemStatus) => {
+    if(subStatus.message === 'error') {
+      console.log('subStatus', subStatus);
+      showError("Inference Server Down");
+      return
+    }
     console.log('subStatus', subStatus);
     pendingSubStatus.value = subStatus;
     pendingSub.value = {...subStatus.postObj};
@@ -60,7 +67,8 @@ function probeStatus() {
         submissionToDisplay.value = envelope.data;
       });*/
     } else if (pendingSub.value.status === 'no submission') {
-      throw new Error('No submission');
+      //throw new Error('No submission');
+      showError('No submission');
       return
     }
   });
