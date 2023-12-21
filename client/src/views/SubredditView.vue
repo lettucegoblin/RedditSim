@@ -2,23 +2,41 @@
 import { type SubmissionsItem, type Subreddit } from '@/model/subreddit'
 import SubredditInfoBar from '@/components/SubredditInfoBar.vue'
 import { computed, defineAsyncComponent, ref, type PropType, onMounted, watch } from 'vue'
-import { getSubmissions, getSubredditByName } from '@/model/subreddit'
+import { getSubmissions, getSubredditByName, getSubmission } from '@/model/subreddit'
 import { useRoute } from 'vue-router'
 import PostModal from '@/components/PostModal.vue'
 const route = useRoute()
 const PostListItem = defineAsyncComponent(() => import('../components/PostListItem.vue'))
-
 watch(
-  () => route.params.subreddit,
-  async (newSubreddit) => {
+  () => route.params,
+  async (newParams) => {    
+    let newSubreddit = makeString(newParams.subreddit)
+    // split newSubreddit on | and take the first item
+    
+    const newSubmissionId = newSubreddit.split('|')[1]
+    
+    newSubreddit = newSubreddit.split('|')[0]
+    console.log('newSubmission', newSubmissionId)
+    if(newSubmissionId){
+      //change url to newSubreddit
+      getSubmission(newSubreddit, newSubmissionId).then((envelope) => {
+        console.log('envelope', envelope)
+        const { data } = envelope
+        console.log('data', data)
+        openSubmissionModal(data)
+      })
+    }
+
+
     submissions.value = []
     toBeGenerated.value = 0
-    currentSubreddit.value = makeString(newSubreddit)
+    currentSubreddit.value = newSubreddit
     subreddit.value = undefined
     console.log('currentSubreddit', currentSubreddit.value)
     dataInit()
   }
 )
+
 const makeString = (str: string | string[]) =>
   Array.isArray(str) ? str[0].toString() : str ? str.toString() : 'all'
 

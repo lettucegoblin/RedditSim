@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import type { Subreddit } from '@/model/subreddit';
+import { type Subreddit, searchSubsAndPosts } from '@/model/subreddit';
 import { ref } from 'vue';
+
 
 const props = defineProps({
   searchType: {
@@ -24,6 +25,17 @@ const search = () => {
       return subreddit.display_name.toLowerCase().includes(searchQuery.value.toLowerCase())
     })
     emit('search', filteredSubreddits, searchQuery.value)
+  }
+  else if(props.searchType == 'posts') {
+    if (searchQuery.value.length < 1) {
+      emit('search', [], [], searchQuery.value)
+      return
+    }
+    searchSubsAndPosts(searchQuery.value, 1, 5).then((response) => {
+      console.log('searchSubsAndPosts', response.data)
+      const { subreddits, submissions } = response.data
+      emit('search', subreddits.items, submissions.items, searchQuery.value)
+    })
   }
 }
 

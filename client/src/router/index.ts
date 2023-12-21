@@ -25,7 +25,7 @@ const router = createRouter({
     {
       path: '/r/:subreddit',
       name: 'subreddit',
-      component: SubredditView,   
+      component: SubredditView  
     }
   ]
 })

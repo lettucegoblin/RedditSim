@@ -63,6 +63,19 @@ async function add(subreddit_id, submission) {
   return await col.insertOne({ subreddit_id, ...submission });
 }
 
+async function searchPosts(searchTerm, page = 1, pageSize = 30) {
+  const col = await collection();
+  const query = {
+    $or: [
+      { text: { $regex: searchTerm, $options: 'i' } },
+      { title: { $regex: searchTerm, $options: 'i' } }
+    ]
+  };
+  const items = await col.find(query).skip((page-1) * pageSize).limit(pageSize).toArray();
+  const total = await col.countDocuments(query);
+  return { items, total };
+}
+
 // delete all(for testing)
 async function deleteAll() {
   const col = await collection();
@@ -74,5 +87,6 @@ module.exports = {
   getAllBySubredditId,
   add,
   deleteAll,
-  get
+  get,
+  searchPosts,
 };

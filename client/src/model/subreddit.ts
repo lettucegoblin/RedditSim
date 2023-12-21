@@ -75,6 +75,10 @@ export function getSubmission(subredditName: string, submissionId: string): Prom
 export function getCommentPathsBySubmissionId(submissionId: string): Promise<DataListEnvelope<CommentPath>> {
   return myFetch.api(`subreddits/comments/list/${submissionId}`);
 }
+//searchSubsAndPosts
+export function searchSubsAndPosts(searchTerm: string, page: number, pageSize: number): Promise<DataEnvelope<{subreddits: DataListEnvelope<Subreddit>, submissions: DataListEnvelope<SubmissionsItem>}>> {
+  return myFetch.api(`subreddits/searchSubsAndPosts/${searchTerm}`, { page, pageSize });
+}
 
 //addToEndOfCommentPath
 export function addToEndOfCommentPath(commentPathId: string, submissionId: string, comment: pendingComment): Promise<DataEnvelope<CommentPath>> {

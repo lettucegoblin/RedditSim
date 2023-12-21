@@ -110,6 +110,14 @@ async function getCommentPathsRoots(submissionId) {
   return await Comments.getCommentPathsRoots(submissionId);
 }
 
+async function searchSubsAndPosts(searchTerm, page = 1, pageSize = 30) {
+  const col = await collection();
+  const items = await col.find({ display_name: { $regex: searchTerm, $options: 'i' } }).sort({ subscribers: -1 }).skip((page-1) * pageSize).limit(pageSize).toArray();
+  const total = await col.countDocuments({ display_name: { $regex: searchTerm, $options: 'i' } });
+  const submissions = await Submissions.searchPosts(searchTerm, page, pageSize);
+  return { subreddits: {items, total}, submissions };
+}
+
 module.exports = {
   getAll,
   getById,
@@ -125,4 +133,5 @@ module.exports = {
   getCommentPath,
   getCommentPathsRoots,
   addToEndOfCommentPath,
+  searchSubsAndPosts
 };

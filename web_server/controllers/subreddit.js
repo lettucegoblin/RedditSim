@@ -65,7 +65,16 @@ router
       })
       .catch(next);
   })
-  .get("/deleteAll", (req, res, next) => {
+  .post("/searchSubsAndPosts/:searchTerm", (req, res, next) => {
+    const { searchTerm } = req.params;
+    // page, pageSize
+    const { page, pageSize } = req.body;
+    model.searchSubsAndPosts(searchTerm, page, pageSize).then((result) => {
+      const data = { data: result, isSuccessful: true };
+      res.json(data);
+    }).catch(next);
+  })
+  .get("/deleteAll", requireUser(true), (req, res, next) => {
     model
       .deleteAll()
       .then((result) => {
@@ -74,7 +83,7 @@ router
       })
       .catch(next);
   })
-  .get("/deleteAllSubmissions", (req, res, next) => {
+  .get("/deleteAllSubmissions", requireUser(true), (req, res, next) => {
     model
       .deleteAllSubmissions()
       .then((result) => {
@@ -111,8 +120,7 @@ router
       })
       .catch(next);
   })
-  .post(
-    "/comments/:submissionid/:commentPathId",
+  .post("/comments/:submissionid/:commentPathId",
     requireUser(),
     (req, res, next) => {
       const { submissionid, commentPathId } = req.params;

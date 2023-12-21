@@ -14,6 +14,7 @@ import {
 import SearchVue from '@/components/Search.vue'
 const darkMode = ref(true)
 import { getSession, useLogin } from '@/model/session'
+import type { SubmissionsItem, Subreddit } from '@/model/subreddit'
 const session = getSession()
 const { login, logout } = useLogin()
 const toggleDarkMode = () => {
@@ -31,6 +32,35 @@ const navigation = [
   { name: 'Projects', href: '#', current: false },
   { name: 'Calendar', href: '#', current: false }
 ]
+
+const searchResultSubs = ref([] as Subreddit[])
+const searchResultPosts = ref([] as SubmissionsItem[])
+const searchQuery = ref('')
+//renderSearch
+const renderSearch = (
+  searchSubResults: Subreddit[],
+  searchPostResults: SubmissionsItem[],
+  _searchQuery: string
+) => {
+  console.log('renderSearch', searchSubResults, searchPostResults, searchQuery)
+  searchResultSubs.value = searchSubResults
+  searchResultPosts.value = searchPostResults
+  searchQuery.value = _searchQuery
+}
+
+const clearSearch = () => {
+  searchQuery.value = ''
+  searchResultSubs.value = []
+  searchResultPosts.value = []
+}
+
+//remove /r/ from subreddit name
+const sanitizeSubName = (subName: string) => {
+  if (subName.startsWith('/r/')) {
+    return subName.substring(3)
+  }
+  return subName
+}
 </script>
 
 <template>
@@ -56,7 +86,8 @@ const navigation = [
               </RouterLink>
             </div>
           </div>
-          <SearchVue searchType="posts" class="ml-6"/>
+          <SearchVue searchType="posts" class="ml-6" @search="renderSearch" />
+
           <div class="flex static inset-auto ml-6 pr-0">
             <div class="flex items-center space-x-2">
               <button
@@ -78,10 +109,10 @@ const navigation = [
               </button>
             </div>
             <!-- Profile dropdown -->
-            <Menu v-if="session.user"  as="div" class="relative ml-3">
+            <Menu v-if="session.user" as="div" class="relative ml-3">
               <div>
                 <MenuButton
-                  class="relative flex rounded-full bg-gray-800 text-sm focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800 "
+                  class="relative flex rounded-full bg-gray-800 text-sm focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800"
                 >
                   <span class="absolute -inset-1.5" />
                   <span class="sr-only">Open user menu</span>
@@ -124,7 +155,8 @@ const navigation = [
                     >
                   </MenuItem>
                   <MenuItem v-slot="{ active }">
-                    <a @click="logout"
+                    <a
+                      @click="logout"
                       href="#"
                       :class="[
                         active ? 'bg-gray-100' : '',
@@ -137,28 +169,28 @@ const navigation = [
               </transition>
             </Menu>
             <div v-else>
-            <RouterLink  to="/login" class="ml-3">
-              <button
-                type="button"
-                class="relative rounded-full w-10 h-10 hover:text-gray-500 dark:hover:text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800"
-              >
-                <span class="absolute -inset-1.5" />
-                <span class="">Sign In</span>
-                <font-awesome-icon icon="sign-in-alt" class="h-6 w-6" />
-              </button>
-            </RouterLink>
-            <!--Sign Up-->
-            <RouterLink to="/signup" class="ml-3">
-              <button
-                type="button"
-                class="relative rounded-full w-10 h-10 hover:text-gray-500 dark:hover:text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800"
-              >
-                <span class="absolute -inset-1.5" />
-                <span class="">Sign Up</span>
-                <font-awesome-icon icon="user-plus" class="h-6 w-6" />
-              </button>
-            </RouterLink>
-          </div>
+              <RouterLink to="/login" class="ml-3">
+                <button
+                  type="button"
+                  class="relative rounded-full w-10 h-10 hover:text-gray-500 dark:hover:text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800"
+                >
+                  <span class="absolute -inset-1.5" />
+                  <span class="">Sign In</span>
+                  <font-awesome-icon icon="sign-in-alt" class="h-6 w-6" />
+                </button>
+              </RouterLink>
+              <!--Sign Up-->
+              <RouterLink to="/signup" class="ml-3">
+                <button
+                  type="button"
+                  class="relative rounded-full w-10 h-10 hover:text-gray-500 dark:hover:text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800"
+                >
+                  <span class="absolute -inset-1.5" />
+                  <span class="">Sign Up</span>
+                  <font-awesome-icon icon="user-plus" class="h-6 w-6" />
+                </button>
+              </RouterLink>
+            </div>
           </div>
         </div>
       </div>
@@ -183,6 +215,55 @@ const navigation = [
       </DisclosurePanel>
     </Disclosure>
   </header>
+  <div style="position: relative">
+    <div v-if="searchQuery.length > 0" id="searchBoxResults" class="flex flex-col">
+      <p> Subreddits: </p>
+      <div v-if="searchResultSubs.length > 0">
+        <div class="searchItem" v-for="result in searchResultSubs" v-bind:key="result._id">
+          <RouterLink @click="clearSearch" :to="{ name: 'subreddit', params: { subreddit: result.display_name } }"><p>{{ result.display_name }}</p></RouterLink>
+          
+        </div>
+      </div>
+      <div class="searchItem" v-else>
+        <p>No subreddits found</p>
+      </div>
+      <p style="padding-top:1em"> Posts: </p>
+      <div v-if="searchResultPosts.length > 0">
+        <div class="searchItem" v-for="result in searchResultPosts" v-bind:key="result._id">
+          <RouterLink @click="clearSearch" :to="{ name: 'subreddit', params: { subreddit: sanitizeSubName(result.subreddit )} }"><p>{{ result.title }}</p></RouterLink>
+        </div>
+      </div>  
+      <div class="searchItem" v-else>
+        <p>No posts found</p>
+      </div> 
+    </div>
+  </div>
 </template>
 
-<style scoped></style>
+<style scoped>
+.searchItem{
+  padding: 0.5em;
+}
+#searchBoxResults div :hover {
+  background: #1a2a2a;
+  cursor: pointer;
+}
+#searchBoxResults > p {
+  color: #fff;
+  font-size: 1em;
+  padding: 0.5em;
+  margin: 0;
+}
+#searchBoxResults {
+  position: absolute;
+  z-index: 999;
+  background: #152528;
+  border: solid #0c1416;
+  top: -8px;
+
+  border-radius: 0em 0em 1em 1em;
+  padding: 1em;
+  left: 50%;
+  transform: translateX(-50%);
+}
+</style>

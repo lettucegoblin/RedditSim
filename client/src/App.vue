@@ -4,6 +4,7 @@ import NavBar from './components/NavBar.vue'
 import Footer from './components/Footer.vue'
 import { ref } from 'vue'
 import SideBar from './components/SideBar.vue'
+
 </script>
 
 <template>
